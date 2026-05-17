@@ -28,18 +28,21 @@ const RegisterPage = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+
     const formData = new FormData(e.target);
-    const name = formData.get("name");
-    const email = formData.get("email");
-    const password = formData.get("password");
-    const photo = formData.get("photo");
+
+    const { name, email, password, photo } = Object.fromEntries(
+      formData.entries(),
+    );
 
     const { data, error } = await authClient.signUp.email({
-      name,
-      email,
-      password,
-      image: photo,
+      name: name.trim(),
+      email: email.trim(),
+      password: password.trim(),
+      image: photo.trim(),
     });
+
+    console.log("data", data);
 
     if (!error) {
       await authClient.signOut();
