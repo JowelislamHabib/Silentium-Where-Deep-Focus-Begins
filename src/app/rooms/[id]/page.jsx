@@ -21,11 +21,12 @@ const RoomDetails = async ({ params }) => {
 
   return (
     <section className="min-h-screen bg-stone-50">
-      <div className="border-b border-stone-200/80 bg-white/80 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-4">
+      <div className="relative overflow-hidden border-b border-indigo-100/60 bg-gradient-to-br from-indigo-100/50 via-white to-violet-50">
+        <div aria-hidden className="pointer-events-none absolute -right-12 top-0 size-48 rounded-full bg-indigo-300/20 blur-3xl" />
+        <div className="container relative mx-auto px-4 py-5">
           <Link
             href="/rooms"
-            className="inline-flex items-center gap-2 text-sm font-medium text-stone-600 transition-colors hover:text-indigo-600"
+            className="inline-flex items-center gap-2 rounded-full border border-white/80 bg-white/70 px-4 py-2 text-sm font-medium text-stone-600 shadow-sm backdrop-blur-sm transition-colors hover:border-indigo-200 hover:text-indigo-600"
           >
             <RiArrowLeftLine className="size-4" />
             All focus spaces
@@ -71,7 +72,7 @@ const RoomDetails = async ({ params }) => {
                   </h1>
                 </div>
 
-                <span className="inline-flex items-center gap-2 rounded-xl bg-stone-50 px-4 py-2.5 text-sm font-medium text-stone-700 ring-1 ring-stone-200/80">
+                <span className="inline-flex items-center gap-2 rounded-full bg-stone-50 px-4 py-2.5 text-sm font-medium text-stone-700 ring-1 ring-stone-200/80">
                   <RiUserLine className="size-4 text-indigo-600" />
                   {capacity} {capacity === 1 ? "seat" : "seats"}
                 </span>
@@ -97,7 +98,7 @@ const RoomDetails = async ({ params }) => {
                     {room.amenities.map((amenity) => (
                       <li
                         key={amenity}
-                        className="flex items-center gap-2.5 rounded-xl bg-stone-50 px-3 py-2.5 text-sm text-stone-700 ring-1 ring-stone-200/60"
+                        className="flex items-center gap-2.5 rounded-full bg-stone-50 px-4 py-2.5 text-sm text-stone-700 ring-1 ring-stone-200/60"
                       >
                         <RiCheckboxCircleLine className="size-4 shrink-0 text-indigo-500" />
                         {amenity}

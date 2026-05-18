@@ -3,103 +3,98 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Button, Card } from "@heroui/react";
-import { motion } from "motion/react";
+import { Button } from "@heroui/react";
 import {
-  RiUserLine,
-  RiMoneyDollarCircleLine,
-  RiMapPinLine,
   RiArrowRightLine,
+  RiCheckboxCircleLine,
+  RiMapPinLine,
+  RiUserLine,
 } from "react-icons/ri";
 
 const RoomCard = ({ room }) => {
-  const allRoom = room;
-
-  const visibleAmenities = allRoom?.amenities?.slice(0, 3) || [];
-  const extraAmenitiesCount = (allRoom?.amenities?.length || 0) - 3;
+  const visibleAmenities = room?.amenities?.slice(0, 2) || [];
+  const extraAmenitiesCount = (room?.amenities?.length || 0) - 2;
+  const capacity = room?.capacity ?? 1;
+  const hourlyRate = Number(room?.hourlyRate) || 0;
 
   return (
-    <div className="h-full">
-      <Card className="h-full bg-stone-100 rounded-xl border border-stone-200 overflow-hidden flex flex-col justify-between shadow-sm p-5 transition-all duration-200 hover:bg-indigo-50/30 hover:backdrop-blur-md hover:shadow-lg hover:border-indigo-200">
-        <div>
-          <div className="relative w-full h-56 overflow-hidden rounded-lg">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.3 }}
-              className="w-full h-full relative"
-            >
-              <Image
-                src={allRoom?.image}
-                alt={allRoom?.name || "Focus Space"}
-                fill
-                sizes="(max-width: 768px) 100vw, 33vw"
-                className="object-cover"
-              />
-            </motion.div>
-          </div>
-
-          <div className="mt-5 space-y-4">
-            <div className="space-y-1">
-              <h2 className="text-xl font-bold text-gray-900">
-                {allRoom?.name}
-              </h2>
-              <div className="flex items-center gap-2 text-gray-500 text-sm">
-                <span className="text-indigo-500">
-                  <RiMapPinLine className="text-base" />
-                </span>
-                <span>{allRoom?.floor}</span>
-              </div>
-            </div>
-
-            <p className="text-sm text-gray-500 line-clamp-2">
-              {allRoom?.description}
-            </p>
-
-            <div className="flex items-center gap-4 py-2 border-y border-stone-200 text-sm text-gray-900">
-              <div className="flex items-center gap-1.5">
-                <span className="text-indigo-500">
-                  <RiUserLine className="text-base" />
-                </span>
-                <span>{allRoom?.capacity} seats</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-indigo-500">
-                  <RiMoneyDollarCircleLine className="text-base" />
-                </span>
-                <span>${allRoom?.hourlyRate}/hr</span>
-              </div>
-            </div>
-
-            {allRoom?.amenities && allRoom?.amenities.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 pt-1">
-                {visibleAmenities.map((amenity, idx) => (
-                  <span
-                    key={idx}
-                    className="px-2.5 py-1 bg-stone-50 border border-stone-200 text-gray-600 text-xs rounded-full"
-                  >
-                    {amenity}
-                  </span>
-                ))}
-                {extraAmenitiesCount > 0 && (
-                  <span className="px-2.5 py-1 bg-indigo-50 border border-indigo-100 text-indigo-600 text-xs rounded-full">
-                    +{extraAmenitiesCount} more
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
+    <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm ring-1 ring-stone-900/5 transition-all duration-200 hover:border-indigo-200 hover:shadow-md hover:ring-indigo-100">
+      <Link
+        href={`/rooms/${room?._id}`}
+        className="relative block overflow-hidden"
+      >
+        <div className="relative aspect-[4/3] w-full bg-stone-100">
+          <Image
+            src={
+              room?.image ||
+              "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800"
+            }
+            alt={room?.name || "Focus space"}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-stone-900/40 via-transparent to-transparent" />
         </div>
 
-        <div className="pt-4">
-          <Link href={`/rooms/${allRoom?._id}`} className="block w-full">
-            <Button className="w-full h-12 bg-indigo-500 text-white rounded-full text-sm font-medium hover:bg-indigo-600 flex items-center justify-center gap-2">
-              <span>View Details</span>
-              <RiArrowRightLine className="text-base" />
+        <span className="absolute right-3 top-3 rounded-full bg-white/95 px-2.5 py-1 text-sm font-bold text-indigo-600 shadow-sm backdrop-blur-sm">
+          ${hourlyRate}
+          <span className="text-[10px] font-medium text-stone-500">/hr</span>
+        </span>
+      </Link>
+
+      <div className="flex flex-1 flex-col p-5">
+        <Link href={`/rooms/${room?._id}`} className="space-y-2">
+          <h2 className="line-clamp-1 text-lg font-semibold text-stone-900 transition-colors group-hover:text-indigo-700">
+            {room?.name}
+          </h2>
+          <p className="line-clamp-2 text-sm leading-relaxed text-stone-500">
+            {room?.description}
+          </p>
+        </Link>
+
+        <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-stone-600">
+          {room?.floor && (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-stone-50 px-3 py-1.5 ring-1 ring-stone-200/80">
+              <RiMapPinLine className="size-3.5 text-indigo-600" />
+              {room.floor}
+            </span>
+          )}
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-stone-50 px-3 py-1.5 ring-1 ring-stone-200/80">
+            <RiUserLine className="size-3.5 text-indigo-600" />
+            {capacity} {capacity === 1 ? "seat" : "seats"}
+          </span>
+        </div>
+
+        {visibleAmenities.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {visibleAmenities.map((amenity) => (
+              <span
+                key={amenity}
+                className="inline-flex items-center gap-1 rounded-full border border-stone-200 bg-stone-50 px-2 py-0.5 text-[11px] font-medium text-stone-600"
+              >
+                <RiCheckboxCircleLine className="size-3 text-indigo-500" />
+                {amenity}
+              </span>
+            ))}
+            {extraAmenitiesCount > 0 && (
+              <span className="rounded-full border border-dashed border-stone-300 px-2 py-0.5 text-[11px] font-medium text-stone-500">
+                +{extraAmenitiesCount}
+              </span>
+            )}
+          </div>
+        )}
+
+        <div className="mt-auto pt-5">
+          <Link href={`/rooms/${room?._id}`} className="block">
+            <Button className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-indigo-600 text-sm font-semibold text-white shadow-sm shadow-indigo-600/20 transition-all hover:bg-indigo-700 group-hover:shadow-md">
+              View space
+              <RiArrowRightLine className="size-4 transition-transform group-hover:translate-x-0.5" />
             </Button>
           </Link>
         </div>
-      </Card>
-    </div>
+      </div>
+    </article>
   );
 };
 
