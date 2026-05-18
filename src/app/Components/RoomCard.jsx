@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Button } from "@heroui/react";
+import { Button, Separator } from "@heroui/react";
 import {
   RiArrowRightLine,
   RiCheckboxCircleLine,
@@ -23,7 +23,7 @@ const RoomCard = ({ room }) => {
         href={`/rooms/${room?._id}`}
         className="relative block overflow-hidden"
       >
-        <div className="relative aspect-[4/3] w-full bg-stone-100">
+        <div className="relative aspect-4/3 w-full bg-stone-100">
           <Image
             src={
               room?.image ||
@@ -48,37 +48,38 @@ const RoomCard = ({ room }) => {
           <h2 className="line-clamp-1 text-lg font-semibold text-stone-900 transition-colors group-hover:text-indigo-700">
             {room?.name}
           </h2>
+
           <p className="line-clamp-2 text-sm leading-relaxed text-stone-500">
             {room?.description}
           </p>
         </Link>
-
-        <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-stone-600">
+        <div className="mt-4 flex flex-wrap justify-between items-center gap-2 text-xs text-stone-600 ">
+          <Separator className="my-1" />
           {room?.floor && (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-stone-50 px-3 py-1.5 ring-1 ring-stone-200/80">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-stone-50 px-3 py-1.5  ">
               <RiMapPinLine className="size-3.5 text-indigo-600" />
               {room.floor}
             </span>
           )}
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-stone-50 px-3 py-1.5 ring-1 ring-stone-200/80">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-stone-50 px-3 py-1.5 ">
             <RiUserLine className="size-3.5 text-indigo-600" />
             {capacity} {capacity === 1 ? "seat" : "seats"}
           </span>
+          <Separator className="my-1" />
         </div>
-
         {visibleAmenities.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-1.5">
             {visibleAmenities.map((amenity) => (
               <span
                 key={amenity}
-                className="inline-flex items-center gap-1 rounded-full border border-stone-200 bg-stone-50 px-2 py-0.5 text-base font-medium text-stone-600"
+                className="inline-flex items-center gap-1 rounded-full border border-stone-200 bg-stone-50 px-2 py-0.5 text-xs font-medium text-stone-600"
               >
                 <RiCheckboxCircleLine className="size-3 text-indigo-500" />
                 {amenity}
               </span>
             ))}
             {extraAmenitiesCount > 0 && (
-              <span className="rounded-full border border-dashed border-stone-300 px-2 py-0.5 text-base font-medium text-stone-500">
+              <span className="rounded-full border border-dashed border-stone-300 px-2 py-0.5 text-xs font-medium text-stone-500">
                 +{extraAmenitiesCount}
               </span>
             )}
