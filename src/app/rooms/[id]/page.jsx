@@ -1,10 +1,11 @@
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
-  RiUserLine,
-  RiMoneyDollarCircleLine,
-  RiMapPinLine,
+  RiArrowLeftLine,
   RiCheckboxCircleLine,
+  RiMapPinLine,
+  RiUserLine,
 } from "react-icons/ri";
 import BookingButton from "@/app/Components/BookingButton";
 
@@ -12,86 +13,104 @@ const RoomDetails = async ({ params }) => {
   const { id } = await params;
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_SERVER_URL}/rooms/${id}`,
-    {},
+    { next: { revalidate: 60 } },
   );
   const room = await res.json();
 
+  const capacity = room?.capacity ?? 1;
+
   return (
-    <section className="bg-stone-50 min-h-screen">
-      <div className="container mx-auto py-16 px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <div>
-            <div className="relative w-full h-96 rounded-xl overflow-hidden mb-6">
-              <Image
-                src={
-                  room.image ||
-                  "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800"
-                }
-                alt={room.name}
-                fill
-                className="object-cover"
-              />
+    <section className="min-h-screen bg-stone-50">
+      <div className="border-b border-stone-200/80 bg-white/80 backdrop-blur-sm">
+        <div className="container mx-auto px-4 py-4">
+          <Link
+            href="/rooms"
+            className="inline-flex items-center gap-2 text-sm font-medium text-stone-600 transition-colors hover:text-indigo-600"
+          >
+            <RiArrowLeftLine className="size-4" />
+            All focus spaces
+          </Link>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 py-10 lg:py-14">
+        <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(320px,380px)] lg:gap-12">
+          <article className="space-y-8">
+            <div className="relative overflow-hidden rounded-2xl bg-stone-200 shadow-md ring-1 ring-stone-900/5">
+              <div className="relative aspect-[16/10] w-full sm:aspect-[16/9]">
+                <Image
+                  src={
+                    room.image ||
+                    "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800"
+                  }
+                  alt={room.name}
+                  fill
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 60vw"
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-stone-900/50 via-transparent to-transparent" />
+              </div>
+
+              {room.floor && (
+                <span className="absolute bottom-4 left-4 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-stone-800 shadow-sm backdrop-blur-sm">
+                  <RiMapPinLine className="size-3.5 text-indigo-600" />
+                  {room.floor}
+                </span>
+              )}
             </div>
 
-            <div className="space-y-4">
-              <h1 className="text-3xl font-bold text-gray-900">{room.name}</h1>
-              <div className="flex items-center gap-2 text-gray-500 text-sm">
-                <RiMapPinLine className="text-base" />
-                <span>{room.floor}</span>
-              </div>
-              <p className="text-gray-600">{room.description}</p>
+            <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm ring-1 ring-stone-900/5 sm:p-8">
+              <div className="flex flex-wrap items-start justify-between gap-4 border-b border-stone-100 pb-6">
+                <div className="space-y-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">
+                    Focus space
+                  </p>
+                  <h1 className="text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">
+                    {room.name}
+                  </h1>
+                </div>
 
-              <div className="flex items-center gap-6 py-4 border-y border-stone-200">
-                <div className="flex items-center gap-2">
-                  <span className="text-indigo-500">
-                    <RiUserLine className="text-lg" />
-                  </span>
-                  <span className="text-gray-900 font-medium">
-                    Capacity: {room.capacity} seats
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-indigo-500">
-                    <RiMoneyDollarCircleLine className="text-lg" />
-                  </span>
-                  <span className="text-gray-900 font-medium">
-                    ${room.hourlyRate}/hour
-                  </span>
-                </div>
+                <span className="inline-flex items-center gap-2 rounded-xl bg-stone-50 px-4 py-2.5 text-sm font-medium text-stone-700 ring-1 ring-stone-200/80">
+                  <RiUserLine className="size-4 text-indigo-600" />
+                  {capacity} {capacity === 1 ? "seat" : "seats"}
+                </span>
               </div>
 
-              {room.amenities && room.amenities.length > 0 && (
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                    Amenities
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {room.amenities.map((amenity, idx) => (
-                      <span
-                        key={idx}
-                        className="flex items-center gap-1 px-3 py-1 bg-stone-100 rounded-full text-sm text-gray-700"
+              {room.description && (
+                <div className="border-b border-stone-100 py-6">
+                  <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-stone-400">
+                    About this space
+                  </h2>
+                  <p className="text-base leading-relaxed text-stone-600">
+                    {room.description}
+                  </p>
+                </div>
+              )}
+
+              {room.amenities?.length > 0 && (
+                <div className={room.description ? "pt-6" : "py-6"}>
+                  <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-stone-400">
+                    What&apos;s included
+                  </h2>
+                  <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    {room.amenities.map((amenity) => (
+                      <li
+                        key={amenity}
+                        className="flex items-center gap-2.5 rounded-xl bg-stone-50 px-3 py-2.5 text-sm text-stone-700 ring-1 ring-stone-200/60"
                       >
-                        <RiCheckboxCircleLine className="text-indigo-500 text-sm" />
+                        <RiCheckboxCircleLine className="size-4 shrink-0 text-indigo-500" />
                         {amenity}
-                      </span>
+                      </li>
                     ))}
-                  </div>
+                  </ul>
                 </div>
               )}
             </div>
-          </div>
+          </article>
 
-          <div>
-            <div className="bg-stone-100 rounded-xl p-6 shadow-sm sticky top-24">
-              <div className="mb-6 pb-4 border-b border-stone-200">
-                <p className="text-2xl font-bold text-gray-900">
-                  ${room.hourlyRate}
-                </p>
-                <p className="text-gray-500 text-sm">per hour</p>
-              </div>
-
-              <BookingButton room={room} />
-            </div>
+          <div className="lg:pt-2">
+            <BookingButton room={room} />
           </div>
         </div>
       </div>

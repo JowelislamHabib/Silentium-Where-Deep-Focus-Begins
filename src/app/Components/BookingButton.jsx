@@ -7,20 +7,30 @@ import {
   DatePicker,
   Label,
   Button,
-  Input,
   Modal,
-  TextField,
 } from "@heroui/react";
 import { CalendarDate } from "@internationalized/date";
 import {
+  RiArrowDownSLine,
   RiCalendarCheckLine,
-  RiMoneyDollarCircleLine,
-  RiTimeLine,
+  RiCheckboxCircleLine,
+  RiMapPinLine,
+  RiUserLine,
 } from "react-icons/ri";
+
+const fieldLabelClass = "mb-1.5 block text-sm font-medium text-stone-700";
+const fieldClassName =
+  "h-11 w-full rounded-xl border border-stone-200 bg-white text-sm text-stone-800 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100";
+const timeSelectClassName = `${fieldClassName} appearance-none pl-3 pr-9`;
 
 const BookingButton = ({ room }) => {
   const roomName = room?.name || "Focus Space Pod";
   const hourlyRate = Number(room?.hourlyRate) || 0;
+  const capacity = room?.capacity ?? 1;
+  const floor = room?.floor;
+  const amenities = room?.amenities ?? [];
+  const visibleAmenities = amenities.slice(0, 3);
+  const extraAmenitiesCount = amenities.length - visibleAmenities.length;
 
   const [selectedDate, setSelectedDate] = useState(
     new CalendarDate(
@@ -29,41 +39,18 @@ const BookingButton = ({ room }) => {
       new Date().getDate(),
     ),
   );
+
   const [startTime, setStartTime] = useState("09");
   const [endTime, setEndTime] = useState("10");
   const [note, setNote] = useState("");
 
-  const hoursOptions = [
-    { value: "00", label: "12:00 AM" },
-    { value: "01", label: "01:00 AM" },
-    { value: "02", label: "02:00 AM" },
-    { value: "03", label: "03:00 AM" },
-    { value: "04", label: "04:00 AM" },
-    { value: "05", label: "05:00 AM" },
-    { value: "06", label: "06:00 AM" },
-    { value: "07", label: "07:00 AM" },
-    { value: "08", label: "08:00 AM" },
-    { value: "09", label: "09:00 AM" },
-    { value: "10", label: "10:00 AM" },
-    { value: "11", label: "11:00 AM" },
-    { value: "12", label: "12:00 PM" },
-    { value: "13", label: "01:00 PM" },
-    { value: "14", label: "02:00 PM" },
-    { value: "15", label: "03:00 PM" },
-    { value: "16", label: "04:00 PM" },
-    { value: "17", label: "05:00 PM" },
-    { value: "18", label: "06:00 PM" },
-    { value: "19", label: "07:00 PM" },
-    { value: "20", label: "08:00 PM" },
-    { value: "21", label: "09:00 PM" },
-    { value: "22", label: "10:00 PM" },
-    { value: "23", label: "11:00 PM" },
-  ];
+  const hoursOptions = Array.from({ length: 24 }, (_, hour) => {
+    const value = hour.toString().padStart(2, "0");
+    return { value, label: `${value}:00` };
+  });
 
   const calculateTotalCost = () => {
-    const startDecimal = Number(startTime);
-    const endDecimal = Number(endTime);
-    const duration = endDecimal - startDecimal;
+    const duration = Number(endTime) - Number(startTime);
 
     if (duration <= 0 || isNaN(duration)) return 0;
 
@@ -71,12 +58,13 @@ const BookingButton = ({ room }) => {
   };
 
   const computedCost = calculateTotalCost();
-  const calculatedHours = computedCost / hourlyRate;
 
   const handleStartTimeChange = (newStart) => {
     setStartTime(newStart);
+
     if (Number(newStart) >= Number(endTime)) {
       const nextHour = (Number(newStart) + 1).toString().padStart(2, "0");
+
       setEndTime(nextHour === "24" ? "23" : nextHour);
     }
   };
@@ -99,114 +87,194 @@ const BookingButton = ({ room }) => {
   };
 
   return (
-    <div>
-      <Modal>
-        <Button className="w-full h-12 bg-indigo-500 text-white rounded-full text-base font-medium hover:bg-indigo-600 flex items-center justify-center gap-2 transition-colors duration-150">
-          <RiCalendarCheckLine className="text-lg" />
-          <span>Reserve Space</span>
-        </Button>
-        <Modal.Backdrop>
-          <Modal.Container placement="auto">
-            <Modal.Dialog className="sm:max-w-md bg-stone-100 border border-stone-200 rounded-lg shadow-md overflow-hidden">
-              <Modal.CloseTrigger />
-              <Modal.Header className="p-6 pb-0">
-                <div className="flex items-center gap-2 text-gray-900">
-                  <RiCalendarCheckLine className="text-indigo-500 text-xl" />
-                  <Modal.Heading className="text-xl font-bold">
-                    Confirm Reservation
-                  </Modal.Heading>
-                </div>
-                <p className="mt-1.5 text-sm font-normal leading-relaxed text-gray-500">
-                  Reserving infrastructure allocation window for{" "}
-                  <span className="font-semibold text-gray-800">
-                    {roomName}
-                  </span>
-                  .
+    <aside className="sticky top-24 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm ring-1 ring-stone-900/5">
+      <div className="border-b border-stone-100 bg-gradient-to-br from-indigo-50/80 via-white to-stone-50 px-6 py-5">
+        <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">
+          Book this room
+        </p>
+        <h2 className="mt-1 line-clamp-2 text-lg font-semibold leading-snug text-stone-900">
+          {roomName}
+        </h2>
+        <div className="mt-3 flex items-baseline gap-1.5">
+          <span className="text-4xl font-bold tracking-tight text-stone-900">
+            ${hourlyRate}
+          </span>
+          <span className="text-sm font-medium text-stone-500">/ hour</span>
+        </div>
+        {room?.bookingCount != null && (
+          <p className="mt-2 text-xs text-stone-500">
+            {room.bookingCount === 0
+              ? "No bookings yet — grab the first slot"
+              : `${room.bookingCount} booking${room.bookingCount === 1 ? "" : "s"} so far`}
+          </p>
+        )}
+      </div>
+
+      <div className="space-y-4 px-6 py-5">
+        <div
+          className={`grid gap-3 ${floor ? "grid-cols-2" : "grid-cols-1"}`}
+        >
+          {floor && (
+            <div className="flex items-center gap-2.5 rounded-xl bg-stone-50 px-3 py-2.5">
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white text-indigo-600 shadow-sm ring-1 ring-stone-200/80">
+                <RiMapPinLine className="size-4" />
+              </span>
+              <div className="min-w-0">
+                <p className="text-[11px] font-medium uppercase tracking-wide text-stone-400">
+                  Floor
                 </p>
-              </Modal.Header>
+                <p className="truncate text-sm font-semibold text-stone-800">
+                  {floor}
+                </p>
+              </div>
+            </div>
+          )}
 
-              <Modal.Body className="p-6">
-                <div className="bg-stone-50 border border-stone-200 rounded-lg p-4">
-                  <form
-                    onSubmit={handleFormSubmit}
-                    className="flex flex-col gap-4"
+          <div className="flex items-center gap-2.5 rounded-xl bg-stone-50 px-3 py-2.5">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white text-indigo-600 shadow-sm ring-1 ring-stone-200/80">
+              <RiUserLine className="size-4" />
+            </span>
+            <div className="min-w-0">
+              <p className="text-[11px] font-medium uppercase tracking-wide text-stone-400">
+                Capacity
+              </p>
+              <p className="text-sm font-semibold text-stone-800">
+                {capacity} {capacity === 1 ? "seat" : "seats"}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {visibleAmenities.length > 0 && (
+          <div>
+            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-stone-400">
+              Includes
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {visibleAmenities.map((amenity) => (
+                <span
+                  key={amenity}
+                  className="inline-flex items-center gap-1 rounded-full border border-stone-200 bg-stone-50 px-2.5 py-1 text-xs font-medium text-stone-600"
+                >
+                  <RiCheckboxCircleLine className="size-3.5 shrink-0 text-indigo-500" />
+                  {amenity}
+                </span>
+              ))}
+              {extraAmenitiesCount > 0 && (
+                <span className="rounded-full border border-dashed border-stone-300 px-2.5 py-1 text-xs font-medium text-stone-500">
+                  +{extraAmenitiesCount} more
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
+        <Modal>
+          <Button className="group flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 text-sm font-semibold text-white shadow-md shadow-indigo-600/25 transition-all duration-200 hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-600/30 active:scale-[0.98]">
+            <RiCalendarCheckLine className="size-5 transition-transform duration-200 group-hover:scale-110" />
+            Reserve Space
+          </Button>
+
+          <Modal.Backdrop className="bg-black/50 backdrop-blur-sm">
+          <Modal.Container placement="center">
+            <Modal.Dialog className="w-full max-w-md overflow-visible rounded-2xl border border-stone-200 bg-white p-0 shadow-2xl">
+              <Modal.CloseTrigger />
+
+              <form onSubmit={handleFormSubmit}>
+                <Modal.Header className="space-y-1 border-b border-stone-100 px-5 pb-4 pt-5 pr-12">
+                  <Modal.Heading className="text-lg font-semibold text-stone-900">
+                    Reserve Your Room
+                  </Modal.Heading>
+                  <p className="text-sm text-stone-500">
+                    Pick a date and time slot for{" "}
+                    <span className="font-medium text-stone-800">{roomName}</span>
+                    .
+                  </p>
+                </Modal.Header>
+
+                <Modal.Body className="space-y-4 overflow-visible px-5 py-4">
+                  <DatePicker
+                    className="w-full"
+                    name="date"
+                    value={selectedDate}
+                    onChange={setSelectedDate}
                   >
-                    <DatePicker
-                      className="w-full"
-                      name="date"
-                      value={selectedDate}
-                      onChange={setSelectedDate}
-                    >
-                      <Label className="text-xs font-bold text-gray-500 uppercase block mb-1">
-                        Target Date
-                      </Label>
-                      <DateField.Group
-                        fullWidth
-                        className="bg-stone-100 border border-stone-200 rounded-lg px-3 h-11"
-                      >
-                        <DateField.Input>
-                          {(segment) => (
-                            <DateField.Segment
-                              segment={segment}
-                              className="text-sm text-gray-900"
-                            />
-                          )}
-                        </DateField.Input>
-                        <DateField.Suffix>
-                          <DatePicker.Trigger>
-                            <DatePicker.TriggerIndicator className="text-gray-500" />
-                          </DatePicker.Trigger>
-                        </DateField.Suffix>
-                      </DateField.Group>
-                      <DatePicker.Popover className="bg-stone-100 border border-stone-200 rounded-lg shadow-md p-4">
-                        <Calendar aria-label="Reservation Date Target">
-                          <Calendar.Header className="flex items-center justify-between mb-2">
-                            <Calendar.YearPickerTrigger className="flex items-center gap-1 text-sm font-semibold text-gray-900">
-                              <Calendar.YearPickerTriggerHeading />
-                              <Calendar.YearPickerTriggerIndicator />
-                            </Calendar.YearPickerTrigger>
-                            <div className="flex gap-1">
-                              <Calendar.NavButton
-                                slot="previous"
-                                className="text-gray-500 hover:text-gray-900"
-                              />
-                              <Calendar.NavButton
-                                slot="next"
-                                className="text-gray-500 hover:text-gray-900"
-                              />
-                            </div>
-                          </Calendar.Header>
-                          <Calendar.Grid className="w-full text-center">
-                            <Calendar.GridHeader className="text-xs font-medium text-gray-500">
-                              {(day) => (
-                                <Calendar.HeaderCell>{day}</Calendar.HeaderCell>
-                              )}
-                            </Calendar.GridHeader>
-                            <Calendar.GridBody>
-                              {(date) => (
-                                <Calendar.Cell
-                                  date={date}
-                                  className="p-1 text-sm text-gray-900 rounded hover:bg-indigo-50"
-                                />
-                              )}
-                            </Calendar.GridBody>
-                          </Calendar.Grid>
-                        </Calendar>
-                      </DatePicker.Popover>
-                    </DatePicker>
+                    <Label className={fieldLabelClass}>Date</Label>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-xs font-bold text-gray-500 uppercase block mb-1">
-                          Start Time
-                        </label>
+                    <DateField.Group
+                      fullWidth
+                      className={`${fieldClassName} px-3 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-100`}
+                    >
+                      <DateField.Input>
+                        {(segment) => (
+                          <DateField.Segment
+                            segment={segment}
+                            className="text-sm text-stone-800"
+                          />
+                        )}
+                      </DateField.Input>
+
+                      <DateField.Suffix>
+                        <DatePicker.Trigger>
+                          <DatePicker.TriggerIndicator className="text-stone-500" />
+                        </DatePicker.Trigger>
+                      </DateField.Suffix>
+                    </DateField.Group>
+
+                    <DatePicker.Popover className="rounded-xl border border-stone-200 bg-white p-3 shadow-xl">
+                      <Calendar aria-label="Reservation Date">
+                        <Calendar.Header className="mb-3 flex items-center justify-between">
+                          <Calendar.YearPickerTrigger className="flex items-center gap-1 text-sm font-semibold text-stone-800">
+                            <Calendar.YearPickerTriggerHeading />
+                            <Calendar.YearPickerTriggerIndicator />
+                          </Calendar.YearPickerTrigger>
+
+                          <div className="flex items-center gap-1">
+                            <Calendar.NavButton
+                              slot="previous"
+                              className="rounded-lg p-1.5 text-stone-500 hover:bg-stone-100"
+                            />
+                            <Calendar.NavButton
+                              slot="next"
+                              className="rounded-lg p-1.5 text-stone-500 hover:bg-stone-100"
+                            />
+                          </div>
+                        </Calendar.Header>
+
+                        <Calendar.Grid className="w-full text-center">
+                          <Calendar.GridHeader className="text-xs font-medium text-stone-400">
+                            {(day) => (
+                              <Calendar.HeaderCell>{day}</Calendar.HeaderCell>
+                            )}
+                          </Calendar.GridHeader>
+
+                          <Calendar.GridBody>
+                            {(date) => (
+                              <Calendar.Cell
+                                date={date}
+                                className="rounded-lg p-1.5 text-sm text-stone-800 hover:bg-indigo-50"
+                              />
+                            )}
+                          </Calendar.GridBody>
+                        </Calendar.Grid>
+                      </Calendar>
+                    </DatePicker.Popover>
+                  </DatePicker>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className={fieldLabelClass} htmlFor="start-time">
+                        Start
+                      </label>
+                      <div className="relative">
                         <select
+                          id="start-time"
                           required
                           value={startTime}
                           onChange={(e) =>
                             handleStartTimeChange(e.target.value)
                           }
-                          className="w-full h-11 px-3 bg-stone-100 border border-stone-200 rounded-lg text-sm text-gray-900 focus:border-indigo-500 focus:outline-none appearance-none cursor-pointer"
+                          className={timeSelectClassName}
                         >
                           {hoursOptions.slice(0, -1).map((option) => (
                             <option key={option.value} value={option.value}>
@@ -214,16 +282,24 @@ const BookingButton = ({ room }) => {
                             </option>
                           ))}
                         </select>
+                        <RiArrowDownSLine
+                          aria-hidden
+                          className="pointer-events-none absolute right-2.5 top-1/2 size-4 -translate-y-1/2 text-stone-400"
+                        />
                       </div>
-                      <div>
-                        <label className="text-xs font-bold text-gray-500 uppercase block mb-1">
-                          End Time
-                        </label>
+                    </div>
+
+                    <div>
+                      <label className={fieldLabelClass} htmlFor="end-time">
+                        End
+                      </label>
+                      <div className="relative">
                         <select
+                          id="end-time"
                           required
                           value={endTime}
                           onChange={(e) => setEndTime(e.target.value)}
-                          className="w-full h-11 px-3 bg-stone-100 border border-stone-200 rounded-lg text-sm text-gray-900 focus:border-indigo-500 focus:outline-none appearance-none cursor-pointer"
+                          className={timeSelectClassName}
                         >
                           {hoursOptions.map((option) => (
                             <option
@@ -237,71 +313,75 @@ const BookingButton = ({ room }) => {
                             </option>
                           ))}
                         </select>
+                        <RiArrowDownSLine
+                          aria-hidden
+                          className="pointer-events-none absolute right-2.5 top-1/2 size-4 -translate-y-1/2 text-stone-400"
+                        />
                       </div>
                     </div>
+                  </div>
 
-                    <TextField className="w-full" name="note">
-                      <Label className="text-xs font-bold text-gray-500 uppercase block mb-1">
-                        Special Note
-                      </Label>
-                      <Input
-                        placeholder="Add specific arrangements or requests"
-                        value={note}
-                        onChange={(e) => setNote(e.target.value)}
-                        className="w-full h-11 px-3 bg-stone-100 border border-stone-200 rounded-lg text-sm text-gray-900 placeholder-gray-500 focus:outline-none"
-                      />
-                    </TextField>
+                  <div>
+                    <label className={fieldLabelClass} htmlFor="booking-note">
+                      Special note{" "}
+                      <span className="font-normal text-stone-400">
+                        (optional)
+                      </span>
+                    </label>
+                    <textarea
+                      id="booking-note"
+                      name="note"
+                      rows={2}
+                      placeholder="Any setup needed?"
+                      value={note}
+                      onChange={(e) => setNote(e.target.value)}
+                      className={`${fieldClassName} resize-none px-3 py-2.5 placeholder:text-stone-400`}
+                    />
+                  </div>
 
-                    {computedCost > 0 && (
-                      <div className="mt-2 p-4 bg-indigo-50 border border-indigo-100 rounded-lg space-y-2">
-                        <div className="flex items-center justify-between text-xs text-gray-500">
-                          <div className="flex items-center gap-1">
-                            <RiTimeLine className="text-indigo-500 text-base" />
-                            <span>Calculated Duration</span>
-                          </div>
-                          <span className="font-medium text-gray-900">
-                            {calculatedHours.toFixed(1)} hours
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between text-sm">
-                          <div className="flex items-center gap-1 font-medium text-gray-700">
-                            <RiMoneyDollarCircleLine className="text-indigo-500 text-base" />
-                            <span>Total Cost</span>
-                          </div>
-                          <span className="text-lg font-bold text-indigo-600">
-                            ${computedCost.toFixed(2)}
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                  </form>
-                </div>
-              </Modal.Body>
+                  {computedCost > 0 && (
+                    <div className="flex items-center justify-between rounded-xl bg-stone-50 px-4 py-3 text-sm">
+                      <span className="font-medium text-stone-700">
+                        Total cost
+                      </span>
+                      <span className="text-lg font-bold text-indigo-600">
+                        ${computedCost.toFixed(2)}
+                      </span>
+                    </div>
+                  )}
+                </Modal.Body>
 
-              <Modal.Footer className="p-6 pt-0 flex justify-end gap-4">
-                <Button
-                  slot="close"
-                  className="bg-stone-50 border border-stone-200 text-gray-900 rounded-full text-sm font-medium hover:bg-stone-200 px-6 h-10 transition-colors duration-150"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={computedCost <= 0}
-                  className={`rounded-full text-sm font-medium px-6 h-10 transition-colors duration-150 ${
-                    computedCost > 0
-                      ? "bg-indigo-500 text-white hover:bg-indigo-600"
-                      : "bg-stone-200 text-gray-500 cursor-not-allowed"
-                  }`}
-                >
-                  Confirm Reservation
-                </Button>
-              </Modal.Footer>
+                <Modal.Footer className="flex items-center justify-end gap-3 border-t border-stone-100 px-5 py-4">
+                  <Button
+                    slot="close"
+                    className="h-10 rounded-xl border-0 bg-transparent px-3 text-sm font-medium text-stone-600 hover:bg-stone-100"
+                  >
+                    Cancel
+                  </Button>
+
+                  <Button
+                    type="submit"
+                    disabled={computedCost <= 0}
+                    className={`h-10 rounded-xl px-4 text-sm font-medium transition-all ${
+                      computedCost > 0
+                        ? "bg-indigo-600 text-white hover:bg-indigo-700"
+                        : "cursor-not-allowed bg-stone-200 text-stone-400"
+                    }`}
+                  >
+                    Confirm Reservation
+                  </Button>
+                </Modal.Footer>
+              </form>
             </Modal.Dialog>
           </Modal.Container>
-        </Modal.Backdrop>
-      </Modal>
-    </div>
+          </Modal.Backdrop>
+        </Modal>
+
+        <p className="text-center text-xs leading-relaxed text-stone-400">
+          Pick a date and hourly slot · billed by the hour
+        </p>
+      </div>
+    </aside>
   );
 };
 
