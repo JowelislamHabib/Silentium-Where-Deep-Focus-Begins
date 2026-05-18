@@ -8,6 +8,7 @@ import {
   Label,
   Button,
   Modal,
+  toast,
 } from "@heroui/react";
 import { CalendarDate } from "@internationalized/date";
 import {
@@ -46,6 +47,7 @@ const BookingButton = ({ room }) => {
   const [startTime, setStartTime] = useState("09");
   const [endTime, setEndTime] = useState("10");
   const [note, setNote] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const hoursOptions = Array.from({ length: 24 }, (_, hour) => {
     const value = hour.toString().padStart(2, "0");
@@ -75,22 +77,53 @@ const BookingButton = ({ room }) => {
   const { data: session } = authClient.useSession();
   const user = session?.user;
 
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
+  const handleReservation = async () => {
+    if (Number(startTime) >= Number(endTime)) {
+      toast.error("End time must be after start time");
+      return;
+    }
 
-    if (Number(startTime) >= Number(endTime)) return;
+    if (!user) {
+      toast.error("Please sign in to book a room");
+      return;
+    }
+
+    setIsLoading(true);
 
     const reservationData = {
       roomId: room?._id,
+      roomName: room?.name,
       date: selectedDate?.toString(),
       startTime: `${startTime}:00`,
       endTime: `${endTime}:00`,
       note,
       totalCost: computedCost,
+      hourlyRate: hourlyRate,
       userId: user?.id,
+      userEmail: user?.email,
+      userName: user?.name,
     };
 
-    console.log(reservationData);
+    const { data: tokenData } = await authClient.token();
+
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/bookings`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${tokenData?.token}`,
+      },
+      body: JSON.stringify(reservationData),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      toast.success("Booking Confirmed", {
+        description: `Your booking for ${roomName} has been confirmed.`,
+      });
+    } else {
+      toast.danger(data.message || "Failed to create reservation");
+    }
   };
 
   return (
@@ -112,7 +145,7 @@ const BookingButton = ({ room }) => {
           <p className="mt-2 text-xs text-stone-500">
             {room.bookingCount === 0
               ? "No bookings yet — grab the first slot"
-              : `${room.bookingCount} booking${room.bookingCount === 1 ? "" : "s"} so far`}
+              : `This room has ${room.bookingCount} booking${room.bookingCount === 1 ? "" : "s"} so far.`}
           </p>
         )}
       </div>
@@ -195,7 +228,12 @@ const BookingButton = ({ room }) => {
               <Modal.Dialog className="w-full max-w-md overflow-visible rounded-2xl border border-stone-200 bg-white p-0 shadow-2xl">
                 <Modal.CloseTrigger />
 
-                <form onSubmit={handleFormSubmit}>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleReservation();
+                  }}
+                >
                   <Modal.Header className="space-y-1 border-b border-stone-100 px-5 pb-4 pt-5 pr-12">
                     <Modal.Heading className="text-lg font-semibold text-stone-900">
                       Reserve Your Room
@@ -378,6 +416,7 @@ const BookingButton = ({ room }) => {
 
                     <Button
                       type="submit"
+                      isLoading={isLoading}
                       disabled={computedCost <= 0}
                       className={`h-10 rounded-full px-5 text-sm font-medium transition-all ${
                         computedCost > 0
