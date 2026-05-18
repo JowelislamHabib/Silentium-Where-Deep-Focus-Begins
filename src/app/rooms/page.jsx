@@ -7,9 +7,7 @@ import {
 import RoomCard from "../Components/RoomCard";
 
 const RoomsPage = async () => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/rooms`, {
-    next: { revalidate: 60 },
-  });
+  const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/rooms`, {});
   const rooms = await res.json();
   const roomList = Array.isArray(rooms) ? rooms : [];
 

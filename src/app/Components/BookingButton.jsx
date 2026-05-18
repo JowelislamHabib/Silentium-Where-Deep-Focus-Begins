@@ -92,7 +92,7 @@ const BookingButton = ({ room }) => {
     setIsLoading(true);
 
     const reservationData = {
-      roomId: room?._id,
+      roomId: new ObjectId(room?._id),
       roomName: room?.name,
       date: selectedDate?.toString(),
       startTime: `${startTime}:00`,
@@ -111,7 +111,6 @@ const BookingButton = ({ room }) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        authorization: `Bearer ${tokenData?.token}`,
       },
       body: JSON.stringify(reservationData),
     });
@@ -159,10 +158,10 @@ const BookingButton = ({ room }) => {
                 <RiMapPinLine className="size-4" />
               </span>
               <div className="min-w-0">
-                <p className="text-base font-medium uppercase tracking-wide text-stone-400">
+                <p className="text-sm font-medium uppercase text-stone-400">
                   Floor
                 </p>
-                <p className="truncate text-sm font-semibold text-stone-800">
+                <p className="truncate text-xs font-semibold text-stone-800">
                   {floor}
                 </p>
               </div>
@@ -174,10 +173,10 @@ const BookingButton = ({ room }) => {
               <RiUserLine className="size-4" />
             </span>
             <div className="min-w-0">
-              <p className="text-base font-medium uppercase tracking-wide text-stone-400">
+              <p className="text-sm font-medium uppercase text-stone-400">
                 Capacity
               </p>
-              <p className="text-sm font-semibold text-stone-800">
+              <p className="text-xs font-semibold text-stone-800">
                 {capacity} {capacity === 1 ? "seat" : "seats"}
               </p>
             </div>
@@ -186,7 +185,7 @@ const BookingButton = ({ room }) => {
 
         {visibleAmenities.length > 0 && (
           <div>
-            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-stone-400">
+            <p className="mb-2 text-xs font-medium uppercase text-stone-400">
               Includes
             </p>
             <div className="flex flex-wrap gap-1.5">

@@ -56,12 +56,12 @@ const RoomCard = ({ room }) => {
         <div className="mt-4 flex flex-wrap justify-between items-center gap-2 text-xs text-stone-600 ">
           <Separator className="my-1" />
           {room?.floor && (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-stone-50 px-3 py-1.5  ">
+            <span className="inline-flex items-center gap-1.5 text-sm rounded-full bg-stone-50 px-3 py-1.5  ">
               <RiMapPinLine className="size-3.5 text-indigo-600" />
               {room.floor}
             </span>
           )}
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-stone-50 px-3 py-1.5 ">
+          <span className="inline-flex items-center gap-1.5 text-sm rounded-full bg-stone-50 px-3 py-1.5 ">
             <RiUserLine className="size-3.5 text-indigo-600" />
             {capacity} {capacity === 1 ? "seat" : "seats"}
           </span>

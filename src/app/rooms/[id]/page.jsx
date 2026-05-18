@@ -9,15 +9,25 @@ import {
 } from "react-icons/ri";
 import BookingButton from "@/app/Components/BookingButton";
 import { Card } from "@heroui/react";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 const RoomDetails = async ({ params }) => {
   const { id } = await params;
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/rooms/${id}`, {
-    next: { revalidate: 60 },
-  });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/rooms/${id}`,
+    {},
+  );
   const room = await res.json();
 
   const capacity = room?.capacity ?? 1;
+
+  const session = await auth.api.getSession({
+    headers: await headers(), // you need to pass the headers object.
+  });
+  const user = session?.user;
+  const isOwner = user?.id === room?.creatorId;
+  console.log(isOwner);
 
   return (
     <section className="min-h-screen bg-stone-50">
