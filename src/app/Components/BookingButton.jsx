@@ -92,7 +92,7 @@ const BookingButton = ({ room }) => {
     setIsLoading(true);
 
     const reservationData = {
-      roomId: new ObjectId(room?._id),
+      roomId: room?._id,
       roomName: room?.name,
       date: selectedDate?.toString(),
       startTime: `${startTime}:00`,
@@ -104,6 +104,7 @@ const BookingButton = ({ room }) => {
       userEmail: user?.email,
       userName: user?.name,
     };
+    console.log(reservationData);
 
     const { data: tokenData } = await authClient.token();
 
@@ -127,7 +128,7 @@ const BookingButton = ({ room }) => {
   };
 
   return (
-    <aside className="sticky top-24 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm ring-1 ring-stone-900/5">
+    <aside className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm ring-1 ring-stone-900/5">
       <div className="border-b border-indigo-100/50 bg-gradient-to-br from-indigo-100/45 via-white to-violet-50/80 px-6 py-5">
         <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">
           Book this room

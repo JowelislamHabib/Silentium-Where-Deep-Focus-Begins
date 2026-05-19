@@ -25,12 +25,10 @@ const RoomCard = ({ room }) => {
       >
         <div className="relative aspect-4/3 w-full bg-stone-100">
           <Image
-            src={
-              room?.image ||
-              "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800"
-            }
-            alt={room?.name || "Focus space"}
+            src={room?.image}
+            alt={room?.name}
             fill
+            unoptimized
             sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
             className="object-cover transition-transform duration-500 group-hover:scale-105"
           />

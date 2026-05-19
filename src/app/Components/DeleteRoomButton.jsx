@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { AlertDialog, Button, toast } from "@heroui/react";
+import { RiDeleteBinLine } from "react-icons/ri";
 
 const DeleteRoomButton = ({ id }) => {
   const router = useRouter();
@@ -29,8 +30,11 @@ const DeleteRoomButton = ({ id }) => {
   };
 
   return (
-    <AlertDialog>
-      <Button className="rounded-full bg-rose-500 text-white">Delete</Button>
+    <AlertDialog className="w-full">
+      <Button className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-rose-500 px-5 text-sm font-medium text-white transition-colors hover:bg-rose-600">
+        <RiDeleteBinLine className="size-4" />
+        Delete
+      </Button>
       <AlertDialog.Backdrop>
         <AlertDialog.Container placement="center">
           <AlertDialog.Dialog className="sm:max-w-[400px]">

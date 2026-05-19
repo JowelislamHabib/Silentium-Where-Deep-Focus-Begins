@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { auth } from "@/lib/auth";
 import DeleteRoomButton from "../Components/DeleteRoomButton";
+import EditRoom from "../Components/EditRoom";
 import { headers } from "next/headers";
 
 const MyListingsPage = async () => {
@@ -32,13 +32,7 @@ const MyListingsPage = async () => {
               </div>
 
               <div className="flex gap-3">
-                <Link
-                  href={`/edit-room/${room._id}`}
-                  className="px-4 py-2 rounded-full bg-indigo-500 text-white"
-                >
-                  Edit
-                </Link>
-
+                <EditRoom room={room} />
                 <DeleteRoomButton id={room._id} />
               </div>
             </div>

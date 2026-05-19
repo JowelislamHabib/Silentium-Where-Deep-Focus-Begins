@@ -9,7 +9,7 @@ import {
 } from "react-icons/ri";
 import BookingButton from "@/app/Components/BookingButton";
 import DeleteRoomButton from "@/app/Components/DeleteRoomButton";
-import { Card } from "@heroui/react";
+import EditRoom from "@/app/Components/EditRoom";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
@@ -50,30 +50,13 @@ const RoomDetails = async ({ params }) => {
       <div className="container mx-auto px-4 py-10 lg:py-14">
         <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(320px,380px)] lg:gap-12">
           <article className="space-y-8">
-            {isOwner && (
-              <Card className="mb-6 border border-stone-200 bg-white p-5 shadow-sm">
-                <div className="flex flex-wrap gap-3">
-                  <Link
-                    href={`/edit-room/${room._id}`}
-                    className="inline-flex h-11 items-center justify-center rounded-full bg-indigo-600 px-5 text-sm font-medium text-white transition-colors hover:bg-indigo-700"
-                  >
-                    Edit Listing
-                  </Link>
-
-                  <DeleteRoomButton id={room._id} />
-                </div>
-              </Card>
-            )}
-
             <div className="relative overflow-hidden rounded-2xl bg-stone-200 shadow-md ring-1 ring-stone-900/5">
               <div className="relative aspect-[16/10] w-full sm:aspect-[16/9]">
                 <Image
-                  src={
-                    room.image ||
-                    "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800"
-                  }
+                  src={room.image}
                   alt={room.name}
                   fill
+                  unoptimized
                   priority
                   sizes="(max-width: 1024px) 100vw, 60vw"
                   className="object-cover"
@@ -137,7 +120,30 @@ const RoomDetails = async ({ params }) => {
               )}
             </div>
           </article>
-          <div className="lg:pt-2">
+          <div className="sticky top-24 space-y-4 lg:pt-2">
+            {isOwner && (
+              <aside className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm ring-1 ring-stone-900/5">
+                <div className="border-b border-rose-100/60 bg-gradient-to-br from-rose-50/80 via-white to-stone-50 px-6 py-5">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-rose-600">
+                    Your listing
+                  </p>
+                  <h2 className="mt-1 text-lg font-semibold leading-snug text-stone-900">
+                    Manage this space
+                  </h2>
+                  <p className="mt-2 text-sm leading-relaxed text-stone-500">
+                    Update details or remove the listing from Silentium.
+                  </p>
+                </div>
+                <div className="flex flex-col gap-3 p-6">
+                  <div className="w-full">
+                    <EditRoom room={room} />
+                  </div>
+                  <div className="w-full">
+                    <DeleteRoomButton id={room._id} />
+                  </div>
+                </div>
+              </aside>
+            )}
             <BookingButton room={room} />
           </div>
         </div>
