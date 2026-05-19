@@ -12,7 +12,29 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import RescheduleBookingButton from "../Components/RescheduleBookingButton";
 import CancelBookingButton from "../Components/CancelBookingButton";
-import { formatDisplayTime } from "@/lib/booking-time";
+import { formatDisplayTime, parseBookingDate } from "@/lib/booking-time";
+
+const normalizeBookingStatus = (status) => {
+  const value = String(status || "confirmed").toLowerCase();
+  if (value === "cancelled" || value === "canceled") return "cancelled";
+  return "confirmed";
+};
+
+const isBookingOnOrAfterToday = (date) => {
+  const parts = parseBookingDate(date);
+  if (!parts) return false;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const bookingDay = new Date(parts.year, parts.month - 1, parts.day);
+  bookingDay.setHours(0, 0, 0, 0);
+  return bookingDay >= today;
+};
+
+const statusBadgeStyles = {
+  confirmed:
+    "bg-emerald-50 text-emerald-700 ring-emerald-200/80",
+  cancelled: "bg-rose-50 text-rose-700 ring-rose-200/80",
+};
 
 const formatDisplayDate = (date) => {
   if (!date) return "";
@@ -134,6 +156,9 @@ const MyBookingsPage = async () => {
               const duration =
                 Number(booking.endTime?.split(":")[0] ?? 0) -
                 Number(booking.startTime?.split(":")[0] ?? 0);
+              const status = normalizeBookingStatus(booking.status);
+              const canCancel =
+                status === "confirmed" && isBookingOnOrAfterToday(booking.date);
 
               return (
                 <li key={booking._id}>
@@ -157,9 +182,16 @@ const MyBookingsPage = async () => {
                     <div className="col-span-1 grid min-w-0 gap-4 p-1 sm:p-5 md:col-span-6 md:p-6 lg:col-span-7">
                       <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
                         <div className="min-w-0 space-y-1">
-                          <p className="text-[11px] font-semibold uppercase tracking-wider text-indigo-600">
-                            Upcoming session
-                          </p>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <p className="text-[11px] font-semibold uppercase tracking-wider text-indigo-600">
+                              Upcoming session
+                            </p>
+                            <span
+                              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold capitalize ring-1 ${statusBadgeStyles[status]}`}
+                            >
+                              {status}
+                            </span>
+                          </div>
                           <h2 className="text-lg font-semibold text-stone-900 sm:text-xl">
                             {roomId ? (
                               <Link
@@ -254,7 +286,9 @@ const MyBookingsPage = async () => {
 
                     <div className="col-span-1 flex h-full min-h-full flex-col justify-center gap-2.5 border-t border-stone-100 bg-stone-50/60 p-4 sm:p-5 md:col-span-3 md:border-l md:border-t-0 md:p-6 lg:col-span-2">
                       <RescheduleBookingButton booking={booking} />
-                      <CancelBookingButton bookingId={booking._id} />
+                      {canCancel && (
+                        <CancelBookingButton bookingId={booking._id} />
+                      )}
                     </div>
                   </article>
                 </li>
