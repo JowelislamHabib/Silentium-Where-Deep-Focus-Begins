@@ -180,7 +180,7 @@ const NavBar = () => {
             )}
           </div>
 
-          <button
+          <Button
             onClick={() => setIsOpen(!isOpen)}
             className="md:hidden p-2 text-gray-900 bg-stone-100 rounded-full hover:bg-stone-200 transition-colors duration-150"
           >
@@ -189,7 +189,7 @@ const NavBar = () => {
             ) : (
               <RiMenuLine className="text-xl" />
             )}
-          </button>
+          </Button>
         </div>
 
         {isOpen && (

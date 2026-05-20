@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { RiArrowLeftLine, RiHome4Line, RiHotelLine } from "react-icons/ri";
+import { Button } from "@heroui/react";
 
 export default function RoomError({ error, reset, unstable_retry }) {
   const retry = unstable_retry ?? reset;
@@ -21,13 +22,13 @@ export default function RoomError({ error, reset, unstable_retry }) {
           {error?.message || "We could not load this focus space."}
         </p>
         <nav className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:justify-center">
-          <button
+          <Button
             type="button"
             onClick={() => retry()}
             className="inline-flex h-11 items-center justify-center rounded-full bg-indigo-600 px-6 text-sm font-medium text-white transition-colors hover:bg-indigo-700"
           >
             Try again
-          </button>
+          </Button>
           <Link
             href="/rooms"
             className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-stone-200 bg-white px-6 text-sm font-medium text-stone-700 shadow-sm ring-1 ring-stone-900/5 transition-colors hover:border-indigo-200 hover:text-indigo-700"

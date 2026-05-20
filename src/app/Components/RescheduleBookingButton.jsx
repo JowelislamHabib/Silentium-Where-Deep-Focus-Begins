@@ -10,18 +10,15 @@ import {
   Modal,
   toast,
 } from "@heroui/react";
-import { CalendarDate, getLocalTimeZone, today } from "@internationalized/date";
+import { CalendarDate } from "@internationalized/date";
 import { useRouter } from "next/navigation";
 import { RiArrowDownSLine, RiCalendarEventLine } from "react-icons/ri";
 import {
   buildHoursOptions,
-  getDefaultEndHour,
-  getDefaultStartHour,
-  isEndHourDisabled,
-  isStartHourDisabled,
   parseBookingDate,
   parseBookingHour,
 } from "@/lib/booking-time";
+import { authClient } from "@/lib/auth-client";
 
 const fieldLabelClass = "mb-1.5 block text-sm font-medium text-stone-700";
 const fieldClassName =
@@ -50,53 +47,15 @@ const RescheduleBookingButton = ({ booking }) => {
   const [selectedDate, setSelectedDate] = useState(() =>
     toCalendarDate(booking.date),
   );
-  const [startTime, setStartTime] = useState(() => {
-    const dateStr = toCalendarDate(booking.date).toString();
-    const initial = parseBookingHour(booking.startTime);
-    return isStartHourDisabled(initial, dateStr)
-      ? getDefaultStartHour(dateStr)
-      : initial;
-  });
-  const [endTime, setEndTime] = useState(() => {
-    const dateStr = toCalendarDate(booking.date).toString();
-    const initialStart = parseBookingHour(booking.startTime);
-    const start = isStartHourDisabled(initialStart, dateStr)
-      ? getDefaultStartHour(dateStr)
-      : initialStart;
-    const initialEnd = parseBookingHour(booking.endTime);
-    return isEndHourDisabled(initialEnd, dateStr, start)
-      ? getDefaultEndHour(start)
-      : initialEnd;
-  });
+  const [startTime, setStartTime] = useState(
+    parseBookingHour(booking.startTime),
+  );
+  const [endTime, setEndTime] = useState(parseBookingHour(booking.endTime));
   const [loading, setLoading] = useState(false);
 
-  const minSelectableDate = today(getLocalTimeZone());
   const hoursOptions = buildHoursOptions();
-  const selectedDateStr = selectedDate?.toString() ?? "";
-
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
-    const dateStr = date?.toString() ?? "";
-    const nextStart = isStartHourDisabled(startTime, dateStr)
-      ? getDefaultStartHour(dateStr)
-      : startTime;
-
-    if (nextStart !== startTime) {
-      setStartTime(nextStart);
-    }
-
-    const nextEnd = isEndHourDisabled(endTime, dateStr, nextStart)
-      ? getDefaultEndHour(nextStart)
-      : endTime;
-
-    if (nextEnd !== endTime) {
-      setEndTime(nextEnd);
-    }
-  };
 
   const handleStartTimeChange = (newStart) => {
-    if (isStartHourDisabled(newStart, selectedDateStr)) return;
-
     setStartTime(newStart);
 
     if (Number(newStart) >= Number(endTime)) {
@@ -113,10 +72,7 @@ const RescheduleBookingButton = ({ booking }) => {
       return;
     }
 
-    if (isStartHourDisabled(startTime, selectedDateStr)) {
-      toast.danger("Start time must be in the future");
-      return;
-    }
+    const { data: tokenData } = await authClient.token();
 
     const duration = Number(endTime) - Number(startTime);
     const totalCost = duration * hourlyRate;
@@ -131,21 +87,20 @@ const RescheduleBookingButton = ({ booking }) => {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${tokenData?.token}`,
           },
           body: JSON.stringify({
             date,
             startTime: `${startTime}:00`,
             endTime: `${endTime}:00`,
             totalCost,
-            status: "confirmed",
-            cancelledAt: null,
           }),
         },
       );
 
       const data = await res.json();
 
-      if (res.ok) {
+      if (res.ok && data?.success !== false) {
         toast.success("Booking rescheduled");
         router.refresh();
       } else {
@@ -192,8 +147,7 @@ const RescheduleBookingButton = ({ booking }) => {
                   className="w-full"
                   name="date"
                   value={selectedDate}
-                  onChange={handleDateChange}
-                  minValue={minSelectableDate}
+                  onChange={setSelectedDate}
                 >
                   <Label className={fieldLabelClass}>Date</Label>
 
@@ -218,10 +172,7 @@ const RescheduleBookingButton = ({ booking }) => {
                   </DateField.Group>
 
                   <DatePicker.Popover className="rounded-xl border border-stone-200 bg-white p-3 shadow-xl">
-                    <Calendar
-                      aria-label="Reschedule date"
-                      minValue={minSelectableDate}
-                    >
+                    <Calendar aria-label="Reschedule date">
                       <Calendar.Header className="mb-3 flex items-center justify-between">
                         <Calendar.YearPickerTrigger className="flex items-center gap-1 text-sm font-semibold text-stone-800">
                           <Calendar.YearPickerTriggerHeading />
@@ -277,14 +228,7 @@ const RescheduleBookingButton = ({ booking }) => {
                         className={timeSelectClassName}
                       >
                         {hoursOptions.slice(0, -1).map((option) => (
-                          <option
-                            key={option.value}
-                            value={option.value}
-                            disabled={isStartHourDisabled(
-                              option.value,
-                              selectedDateStr,
-                            )}
-                          >
+                          <option key={option.value} value={option.value}>
                             {option.label}
                           </option>
                         ))}
@@ -312,11 +256,7 @@ const RescheduleBookingButton = ({ booking }) => {
                           <option
                             key={option.value}
                             value={option.value}
-                            disabled={isEndHourDisabled(
-                              option.value,
-                              selectedDateStr,
-                              startTime,
-                            )}
+                            disabled={Number(option.value) <= Number(startTime)}
                           >
                             {option.label}
                           </option>
