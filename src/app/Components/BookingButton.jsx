@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Calendar,
   DateField,
@@ -49,6 +49,13 @@ const BookingButton = ({ room }) => {
   const [endTime, setEndTime] = useState("10");
   const [note, setNote] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsMounted(true);
+    }, 100);
+  }, []);
 
   const hoursOptions = buildHoursOptions();
 
@@ -282,19 +289,26 @@ const BookingButton = ({ room }) => {
         )}
 
         <Modal>
-          {user ? (
-            <Button className="group flex h-12 w-full items-center justify-center gap-2 rounded-full bg-indigo-600 text-sm font-semibold text-white shadow-md shadow-indigo-600/25 transition-all duration-200 hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-600/30 active:scale-[0.98]">
-              <RiCalendarCheckLine className="size-5 transition-transform duration-200 group-hover:scale-110" />
-              Reserve Space
-            </Button>
+          {isMounted ? (
+            user ? (
+              <Button className="group flex h-12 w-full items-center justify-center gap-2 rounded-full bg-indigo-600 text-sm font-semibold text-white shadow-md shadow-indigo-600/25 transition-all duration-200 hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-600/30 active:scale-[0.98]">
+                <RiCalendarCheckLine className="size-5 transition-transform duration-200 group-hover:scale-110" />
+                Reserve Space
+              </Button>
+            ) : (
+              <Link
+                href="/login"
+                className="group flex h-12 w-full items-center justify-center gap-2 rounded-full bg-indigo-600 text-sm font-semibold text-white shadow-md shadow-indigo-600/25 transition-all duration-200 hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-600/30 active:scale-[0.98]"
+              >
+                <RiLoginBoxLine className="size-5 transition-transform duration-200 group-hover:scale-110" />
+                Login to Reserve
+              </Link>
+            )
           ) : (
-            <Link
-              href="/login"
-              className="group flex h-12 w-full items-center justify-center gap-2 rounded-full bg-indigo-600 text-sm font-semibold text-white shadow-md shadow-indigo-600/25 transition-all duration-200 hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-600/30 active:scale-[0.98]"
-            >
-              <RiLoginBoxLine className="size-5 transition-transform duration-200 group-hover:scale-110" />
-              Login to Reserve
-            </Link>
+            <div className="group flex h-12 w-full items-center justify-center gap-2 rounded-full bg-indigo-600 text-sm font-semibold text-white shadow-md shadow-indigo-600/25">
+              <RiCalendarCheckLine className="size-5" />
+              Loading...
+            </div>
           )}
 
           <Modal.Backdrop className="bg-black/50 backdrop-blur-sm">
