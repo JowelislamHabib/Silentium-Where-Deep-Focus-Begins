@@ -18,7 +18,7 @@ const RoomCard = ({ room }) => {
   const hourlyRate = Number(room?.hourlyRate) || 0;
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm ring-1 ring-stone-900/5 transition-all duration-200 hover:border-indigo-200 hover:shadow-md hover:ring-indigo-100">
+    <article className="group flex h-full min-h-112 flex-col overflow-hidden rounded-3xl border border-stone-200/90 bg-white/90 shadow-sm ring-1 ring-stone-900/5 transition-all duration-300 hover:-translate-y-1 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-100/40">
       <Link
         href={`/rooms/${room?._id}`}
         className="relative block overflow-hidden"
@@ -32,18 +32,21 @@ const RoomCard = ({ room }) => {
             sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
             className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-stone-900/40 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-stone-900/40 via-transparent to-transparent" />
         </div>
 
-        <span className="absolute right-3 top-3 rounded-full bg-white/95 px-2.5 py-1 text-sm font-bold text-indigo-600 shadow-sm backdrop-blur-sm">
+        <span className="absolute right-3 top-3 rounded-full bg-stone-900 px-3 py-1 text-sm font-bold text-white shadow-sm">
           ${hourlyRate}
-          <span className="text-[10px] font-medium text-stone-500">/hr</span>
+          <span className="text-[10px] font-medium text-stone-300">/hr</span>
         </span>
       </Link>
 
-      <div className="flex flex-1 flex-col p-5">
+      <div className="flex flex-1 flex-col p-5 sm:p-6">
+        <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-indigo-600">
+          Quiet focus room
+        </p>
         <Link href={`/rooms/${room?._id}`} className="space-y-2">
-          <h2 className="line-clamp-1 text-lg font-semibold text-stone-900 transition-colors group-hover:text-indigo-700">
+          <h2 className="line-clamp-1 text-xl font-semibold text-stone-900 transition-colors group-hover:text-indigo-700">
             {room?.name}
           </h2>
 
@@ -51,7 +54,7 @@ const RoomCard = ({ room }) => {
             {room?.description}
           </p>
         </Link>
-        <div className="mt-4 flex flex-wrap justify-between items-center gap-2 text-xs text-stone-600 ">
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-2 text-xs text-stone-600">
           <Separator className="my-1" />
           {room?.floor && (
             <span className="inline-flex items-center gap-1.5 text-sm rounded-full bg-stone-50 px-3 py-1.5  ">
@@ -86,8 +89,8 @@ const RoomCard = ({ room }) => {
 
         <div className="mt-auto pt-5">
           <Link href={`/rooms/${room?._id}`} className="block">
-            <Button className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-indigo-600 text-sm font-semibold text-white shadow-sm shadow-indigo-600/20 transition-all hover:bg-indigo-700 group-hover:shadow-md">
-              View space
+            <Button className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-stone-900 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 group-hover:shadow-md">
+              Book this room
               <RiArrowRightLine className="size-4 transition-transform group-hover:translate-x-0.5" />
             </Button>
           </Link>

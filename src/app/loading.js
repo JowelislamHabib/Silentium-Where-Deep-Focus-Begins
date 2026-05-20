@@ -28,7 +28,7 @@ export default function Loading() {
 
         <div className="grid gap-2">
           <p className="font-heading text-2xl font-bold tracking-tight text-stone-900">
-            Silentium
+            QuietHub
           </p>
           <p className="text-sm font-medium text-stone-500">Loading…</p>
         </div>

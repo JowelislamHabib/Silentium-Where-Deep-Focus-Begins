@@ -510,6 +510,7 @@ const BookingButton = ({ room }) => {
                       type="submit"
                       isLoading={isLoading}
                       disabled={computedCost <= 0}
+                      slot="close"
                       className={`h-10 rounded-full px-5 text-sm font-medium transition-all ${
                         computedCost > 0
                           ? "bg-indigo-600 text-white hover:bg-indigo-700"

@@ -74,9 +74,9 @@ const RoomsFilter = ({
                 type="search"
                 value={filters.search}
                 onChange={onSearchChange}
-                placeholder="Name, floor, vibe…"
+                placeholder="Name, Amenities.."
                 autoComplete="off"
-                className="h-11 w-full rounded-xl border border-stone-200 bg-stone-50/80 pl-11 pr-4 text-sm text-stone-900 shadow-inner shadow-white/50 placeholder:text-stone-400 transition-[border,box-shadow] focus:border-indigo-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                className="h-11 w-full rounded-full border border-stone-200 bg-stone-50/80 pl-11 pr-4 text-sm text-stone-900 shadow-inner shadow-white/50 placeholder:text-stone-400 transition-[border,box-shadow] focus:border-indigo-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100"
               />
             </div>
           </div>
@@ -84,10 +84,7 @@ const RoomsFilter = ({
           {amenityOptions.length > 0 && (
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <RiApps2Line
-                  className="size-3.5 text-indigo-500"
-                  aria-hidden
-                />
+                <RiApps2Line className="size-3.5 text-indigo-500" aria-hidden />
                 <span className={fieldLabel}>Amenities</span>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -140,10 +137,8 @@ const RoomsFilter = ({
                     min={0}
                     value={filters.minRate}
                     onChange={onMinRateChange}
-                    placeholder={
-                      minRateGlobal ? String(minRateGlobal) : "From"
-                    }
-                    className="h-11 w-full rounded-xl border border-stone-200 bg-stone-50/80 pl-8 pr-3 text-sm text-stone-900 tabular-nums transition-[border,box-shadow] focus:border-indigo-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                    placeholder={minRateGlobal ? String(minRateGlobal) : "From"}
+                    className="h-11 w-full rounded-full border border-stone-200 bg-stone-50/80 pl-8 pr-3 text-sm text-stone-900 tabular-nums transition-[border,box-shadow] focus:border-indigo-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100"
                   />
                 </div>
               </div>
@@ -165,10 +160,8 @@ const RoomsFilter = ({
                     min={0}
                     value={filters.maxRate}
                     onChange={onMaxRateChange}
-                    placeholder={
-                      maxRateGlobal ? String(maxRateGlobal) : "To"
-                    }
-                    className="h-11 w-full rounded-xl border border-stone-200 bg-stone-50/80 pl-8 pr-3 text-sm text-stone-900 tabular-nums transition-[border,box-shadow] focus:border-indigo-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                    placeholder={maxRateGlobal ? String(maxRateGlobal) : "To"}
+                    className="h-11 w-full rounded-full border border-stone-200 bg-stone-50/80 pl-8 pr-3 text-sm text-stone-900 tabular-nums transition-[border,box-shadow] focus:border-indigo-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100"
                   />
                 </div>
               </div>
@@ -178,10 +171,8 @@ const RoomsFilter = ({
                 Catalog spans{" "}
                 <span className="font-medium text-stone-600">
                   ${minRateGlobal}
-                  {maxRateGlobal > minRateGlobal
-                    ? `–$${maxRateGlobal}`
-                    : ""}{" "}
-                  / hr
+                  {maxRateGlobal > minRateGlobal ? `–$${maxRateGlobal}` : ""} /
+                  hr
                 </span>
                 .
               </p>

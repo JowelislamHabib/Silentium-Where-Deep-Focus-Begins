@@ -14,11 +14,14 @@ import {
 } from "@heroui/react";
 import {
   RiAlignLeft,
+  RiCheckLine,
   RiCheckboxCircleFill,
+  RiCheckboxCircleLine,
   RiFocus3Line,
   RiHotelLine,
   RiImageLine,
   RiLightbulbLine,
+  RiMapPinLine,
   RiMoneyDollarCircleLine,
   RiSparklingLine,
   RiStackLine,
@@ -26,6 +29,7 @@ import {
   RiUserLine,
 } from "react-icons/ri";
 import { authClient } from "@/lib/auth-client";
+import AnimatedCounter from "../Components/AnimatedCounter";
 
 const listingTips = [
   "Clear name + short description help people book faster.",
@@ -34,11 +38,33 @@ const listingTips = [
   "Pick amenities guests actually get; keeps reviews honest.",
 ];
 
-/** Core inputs before amenities: name, description, image, floor, capacity, hourly rate */
 const LISTING_FIELD_COUNT = 6;
 
-const cardClassName =
-  "overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm";
+const surfaceCard =
+  "overflow-hidden rounded-3xl border border-stone-200/90 bg-white/90 shadow-sm ring-1 ring-stone-900/5";
+
+function FormSectionHeader({ icon: Icon, title, description, step }) {
+  return (
+    <div className="flex gap-4">
+      <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 ring-1 ring-indigo-100">
+        <Icon className="size-5" />
+      </span>
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-center gap-2">
+          <h3 className="text-base font-semibold text-stone-900">{title}</h3>
+          {step ? (
+            <span className="rounded-full bg-stone-100 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-stone-500">
+              Step {step}
+            </span>
+          ) : null}
+        </div>
+        <p className="mt-1 text-sm leading-relaxed text-stone-500">
+          {description}
+        </p>
+      </div>
+    </div>
+  );
+}
 
 function isValidImageSrc(src) {
   if (!src || typeof src !== "string") return false;
@@ -129,17 +155,15 @@ const AddRoomPage = () => {
     }
   };
 
-  const formClassName =
-    "order-1 overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm lg:order-2";
   const fieldGroupClassName = "flex flex-col gap-2";
-  const labelClassName = "text-sm font-medium text-gray-900";
+  const labelClassName = "text-sm font-medium text-stone-800";
   const inputClassName =
-    "w-full h-12 rounded border border-stone-200 bg-white pl-12 pr-4 text-sm text-gray-900 transition-colors placeholder:text-gray-500 focus:border-indigo-500 focus:bg-white";
+    "w-full h-11 rounded-xl border border-stone-200/90 bg-stone-50/80 pl-11 pr-4 text-sm text-stone-900 shadow-sm transition-[border-color,box-shadow,background-color] placeholder:text-stone-400 hover:border-stone-300 hover:bg-white focus:border-indigo-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/15";
   const textAreaClassName =
-    "w-full resize-none rounded border border-stone-200 bg-white py-4 pl-12 pr-4 text-sm leading-relaxed text-gray-900 transition-colors placeholder:text-gray-500 focus:border-indigo-500";
-  const sectionClassName = "space-y-6";
-  const sectionTitleClassName = "text-base font-semibold text-gray-900";
-  const sectionHintClassName = "text-sm text-gray-500";
+    "w-full min-h-28 resize-y rounded-xl border border-stone-200/90 bg-stone-50/80 py-3.5 pl-11 pr-4 text-sm leading-relaxed text-stone-900 shadow-sm transition-[border-color,box-shadow,background-color] placeholder:text-stone-400 hover:border-stone-300 hover:bg-white focus:border-indigo-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/15";
+  const hintClassName = "text-xs leading-relaxed text-stone-500";
+  const sectionPanelClassName =
+    "space-y-6 rounded-2xl border border-stone-200/80 bg-stone-50/40 p-5 sm:p-6";
 
   const showRoomPreview = !previewError && isValidImageSrc(previewUrl);
   const userAvatarSrc = isValidImageSrc(user?.image) ? user.image.trim() : null;
@@ -163,7 +187,7 @@ const AddRoomPage = () => {
                 <RiSparklingLine className="size-3.5" />
                 Host a space
               </p>
-              <h1 className="text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl lg:text-5xl">
+              <h1 className="text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">
                 List a Focus Space
               </h1>
               <p className="text-base leading-relaxed text-stone-600 sm:text-lg">
@@ -175,14 +199,19 @@ const AddRoomPage = () => {
             <div className="flex flex-wrap gap-3 lg:shrink-0">
               <div className="rounded-xl border border-white/80 bg-white/80 px-6 py-4 shadow-sm ring-1 ring-indigo-100/80 backdrop-blur-sm">
                 <p className="text-2xl font-bold text-stone-900">
-                  {LISTING_FIELD_COUNT}
+                  <AnimatedCounter
+                    target={LISTING_FIELD_COUNT}
+                    duration={1600}
+                  />
                 </p>
                 <p className="text-xs font-medium uppercase tracking-wide text-stone-500">
                   Fields to complete
                 </p>
               </div>
               <div className="rounded-xl border border-white/80 bg-white/80 px-6 py-4 shadow-sm ring-1 ring-indigo-100/80 backdrop-blur-sm">
-                <p className="text-2xl font-bold text-indigo-600">2 min</p>
+                <p className="text-2xl font-bold text-indigo-600">
+                  <AnimatedCounter value="2 min" duration={1400} />
+                </p>
                 <p className="text-xs font-medium uppercase tracking-wide text-stone-500">
                   Avg. setup
                 </p>
@@ -192,11 +221,11 @@ const AddRoomPage = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-4 lg:gap-8">
-          <aside className="order-2 space-y-4 lg:order-1 lg:col-span-1 lg:sticky lg:top-24 lg:self-start">
-            <div className={cardClassName}>
-              <div className="relative aspect-video bg-stone-100">
+      <div className="container mx-auto px-4 py-10 lg:py-12">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-4 lg:gap-10">
+          <aside className="order-2 space-y-5 lg:order-1 lg:col-span-1 lg:sticky lg:top-24 lg:self-start">
+            <div className={surfaceCard}>
+              <div className="relative aspect-4/3 bg-stone-100">
                 {showRoomPreview ? (
                   <Image
                     src={previewUrl}
@@ -208,7 +237,7 @@ const AddRoomPage = () => {
                   />
                 ) : userAvatarSrc ? (
                   <Image
-                    src="https://images.unsplash.com/photo-1622653533660-a1538fe8424c"
+                    src="https://placehold.net/400x600.png"
                     alt={user?.name ?? "Host"}
                     fill
                     unoptimized
@@ -216,16 +245,17 @@ const AddRoomPage = () => {
                   />
                 ) : (
                   <div className="flex h-full flex-col items-center justify-center gap-2 p-4 text-center">
-                    <span className="flex items-center justify-center rounded bg-white p-2 text-indigo-500 shadow-sm ring-1 ring-stone-200">
-                      <RiImageLine className="text-base" />
+                    <span className="flex size-10 items-center justify-center rounded-2xl bg-white text-indigo-500 shadow-sm ring-1 ring-stone-200/90">
+                      <RiImageLine className="size-5" />
                     </span>
-                    <p className="text-xs font-medium text-gray-500">
+                    <p className="text-xs font-medium text-stone-500">
                       Paste image URL to preview
                     </p>
                   </div>
                 )}
+                <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-stone-900/25 via-transparent to-transparent" />
               </div>
-              <div className="flex items-center gap-3 border-t border-stone-200 p-3">
+              <div className="flex items-center gap-3 border-t border-stone-200/90 bg-white/80 p-4 backdrop-blur-sm">
                 {userAvatarSrc ? (
                   <span className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full ring-2 ring-white">
                     <Image
@@ -242,129 +272,139 @@ const AddRoomPage = () => {
                   </span>
                 )}
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-gray-900">
+                  <p className="truncate text-sm font-semibold text-stone-900">
                     {previewTitle}
                   </p>
-                  <p className="text-xs text-gray-500">Live preview</p>
+                  <p className="text-xs text-stone-500">Live preview</p>
                 </div>
               </div>
             </div>
 
-            <div className={`${cardClassName} p-4`}>
-              <div className="mb-3 flex items-center gap-3">
-                <span className="flex items-center justify-center rounded bg-indigo-50 p-2 text-indigo-500">
-                  <RiLightbulbLine className="text-base" />
+            <div className={`${surfaceCard} p-5`}>
+              <div className="mb-4 flex items-center gap-3">
+                <span className="flex size-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 ring-1 ring-indigo-100">
+                  <RiLightbulbLine className="size-4" />
                 </span>
-                <h2 className="text-sm font-semibold text-gray-900">
+                <h2 className="text-sm font-semibold text-stone-900">
                   Listing tips
                 </h2>
               </div>
-              <ul className="space-y-3">
+              <ul className="space-y-3.5">
                 {listingTips.map((tip) => (
                   <li
                     key={tip}
-                    className="flex gap-3 text-xs leading-relaxed text-gray-500"
+                    className="flex gap-3 text-xs leading-relaxed text-stone-600"
                   >
-                    <RiCheckboxCircleFill className="shrink-0 text-base text-indigo-500" />
+                    <RiCheckboxCircleFill className="mt-0.5 shrink-0 size-4 text-indigo-500" />
                     <span>{tip}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
-            <p className="hidden items-center gap-2 text-xs text-gray-500 lg:flex">
-              <RiTimeLine className="text-base text-indigo-500" />
+            <p className="hidden items-center justify-center gap-2 rounded-2xl border border-dashed border-indigo-200/80 bg-indigo-50/40 px-4 py-3 text-xs font-medium text-indigo-700 lg:flex">
+              <RiTimeLine className="size-4 shrink-0" />
               About 2 min to publish
             </p>
           </aside>
 
           <form
             onSubmit={onSubmit}
-            className={`${formClassName} lg:col-span-3`}
+            className={`${surfaceCard} order-1 lg:order-2 lg:col-span-3`}
           >
-            <div className="border-b border-stone-200 bg-stone-50 px-6 py-5 sm:px-8">
-              <h2 className="text-lg font-semibold text-gray-900">
+            <div className="border-b border-stone-200/90 bg-linear-to-r from-indigo-50/80 via-white to-violet-50/50 px-6 py-6 sm:px-8">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-indigo-600">
+                New listing
+              </p>
+              <h2 className="mt-1 text-xl font-bold tracking-tight text-stone-900 sm:text-2xl">
                 Room details
               </h2>
-              <p className="mt-1 text-sm text-gray-500">
-                Fill in the basics guests see when browsing spaces.
+              <p className="mt-2 max-w-xl text-sm leading-relaxed text-stone-600">
+                Fill in the basics guests see when browsing spaces. All fields
+                marked required must be completed before publishing.
               </p>
             </div>
 
-            <div className="space-y-8 p-6 sm:p-8">
-              <div className={sectionClassName}>
-                <TextField
-                  name="name"
-                  isRequired
-                  className={fieldGroupClassName}
-                >
-                  <Label className={labelClassName}>Room Name</Label>
-                  <div className="relative">
-                    <RiHotelLine className="pointer-events-none absolute left-4 top-1/2 z-10 -translate-y-1/2 text-lg text-gray-500" />
-                    <Input
-                      placeholder="e.g. Silentium Alcove"
-                      className={inputClassName}
-                      value={previewName}
-                      onChange={(e) => setPreviewName(e.target.value)}
-                    />
-                  </div>
-                  <FieldError className="text-sm font-medium text-rose-500" />
-                </TextField>
+            <div className="space-y-6 p-6 sm:p-8">
+              <div className={sectionPanelClassName}>
+                <FormSectionHeader
+                  icon={RiHotelLine}
+                  step={1}
+                  title="Identity & presentation"
+                  description="Name, description, and cover image for your listing card."
+                />
+                <div className="space-y-5 pt-2">
+                  <TextField
+                    name="name"
+                    isRequired
+                    className={fieldGroupClassName}
+                  >
+                    <Label className={labelClassName}>Room name</Label>
+                    <div className="relative">
+                      <RiHotelLine className="pointer-events-none absolute left-3.5 top-1/2 z-10 size-[18px] -translate-y-1/2 text-stone-400" />
+                      <Input
+                        placeholder="e.g. QuietHub Alcove"
+                        className={inputClassName}
+                        value={previewName}
+                        onChange={(e) => setPreviewName(e.target.value)}
+                      />
+                    </div>
+                    <FieldError className="text-sm font-medium text-rose-500" />
+                  </TextField>
 
-                <TextField
-                  name="description"
-                  isRequired
-                  className={fieldGroupClassName}
-                >
-                  <Label className={labelClassName}>Description</Label>
-                  <div className="relative">
-                    <RiAlignLeft className="pointer-events-none absolute left-4 top-4 z-10 text-lg text-gray-500" />
-                    <TextArea
-                      placeholder="Lighting, acoustics, seating, and what makes this room great for focus."
-                      rows={4}
-                      className={textAreaClassName}
-                    />
-                  </div>
-                  <FieldError className="text-sm font-medium text-rose-500" />
-                </TextField>
+                  <TextField
+                    name="description"
+                    isRequired
+                    className={fieldGroupClassName}
+                  >
+                    <Label className={labelClassName}>Description</Label>
+                    <div className="relative">
+                      <RiAlignLeft className="pointer-events-none absolute left-3.5 top-4 z-10 size-[18px] text-stone-400" />
+                      <TextArea
+                        placeholder="Lighting, acoustics, seating, and what makes this room great for focus."
+                        rows={4}
+                        className={textAreaClassName}
+                      />
+                    </div>
+                    <FieldError className="text-sm font-medium text-rose-500" />
+                  </TextField>
 
-                <TextField
-                  name="image"
-                  type="url"
-                  isRequired
-                  className={fieldGroupClassName}
-                >
-                  <Label className={labelClassName}>Image URL</Label>
-                  <div className="relative">
-                    <RiImageLine className="pointer-events-none absolute left-4 top-1/2 z-10 -translate-y-1/2 text-lg text-gray-500" />
-                    <Input
-                      type="url"
-                      placeholder="https://images.unsplash.com/photo-..."
-                      className={inputClassName}
-                      value={previewUrl}
-                      onChange={(e) => {
-                        setPreviewUrl(e.target.value);
-                        setPreviewError(false);
-                      }}
-                    />
-                  </div>
-                  <p className={sectionHintClassName}>
-                    Updates the live preview as you type.
-                  </p>
-                  <FieldError className="text-sm font-medium text-rose-500" />
-                </TextField>
+                  <TextField
+                    name="image"
+                    type="url"
+                    isRequired
+                    className={fieldGroupClassName}
+                  >
+                    <Label className={labelClassName}>Cover image URL</Label>
+                    <div className="relative">
+                      <RiImageLine className="pointer-events-none absolute left-3.5 top-1/2 z-10 size-[18px] -translate-y-1/2 text-stone-400" />
+                      <Input
+                        type="url"
+                        placeholder="https://images.yourroom.com/photo-..."
+                        className={inputClassName}
+                        value={previewUrl}
+                        onChange={(e) => {
+                          setPreviewUrl(e.target.value);
+                          setPreviewError(false);
+                        }}
+                      />
+                    </div>
+                    <p className={hintClassName}>
+                      Use a wide, well-lit photo. Preview updates as you type.
+                    </p>
+                    <FieldError className="text-sm font-medium text-rose-600" />
+                  </TextField>
+                </div>
               </div>
 
-              <div
-                className={`${sectionClassName} border-t border-stone-200 pt-8`}
-              >
-                <div>
-                  <h3 className={sectionTitleClassName}>Location & pricing</h3>
-                  <p className={`mt-1 ${sectionHintClassName}`}>
-                    Help guests find and book your space.
-                  </p>
-                </div>
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+              <div className={sectionPanelClassName}>
+                <FormSectionHeader
+                  icon={RiMapPinLine}
+                  step={2}
+                  title="Location & pricing"
+                  description="Help guests find your space and understand hourly cost."
+                />
+                <div className="grid grid-cols-1 gap-5 pt-2 sm:grid-cols-3">
                   <TextField
                     name="floor"
                     isRequired
@@ -372,7 +412,7 @@ const AddRoomPage = () => {
                   >
                     <Label className={labelClassName}>Floor</Label>
                     <div className="relative">
-                      <RiStackLine className="pointer-events-none absolute left-4 top-1/2 z-10 -translate-y-1/2 text-lg text-gray-500" />
+                      <RiStackLine className="pointer-events-none absolute left-3.5 top-1/2 z-10 size-[18px] -translate-y-1/2 text-stone-400" />
                       <Input
                         placeholder="3rd Floor"
                         className={inputClassName}
@@ -389,7 +429,7 @@ const AddRoomPage = () => {
                   >
                     <Label className={labelClassName}>Capacity</Label>
                     <div className="relative">
-                      <RiUserLine className="pointer-events-none absolute left-4 top-1/2 z-10 -translate-y-1/2 text-lg text-gray-500" />
+                      <RiUserLine className="pointer-events-none absolute left-3.5 top-1/2 z-10 size-[18px] -translate-y-1/2 text-stone-400" />
                       <Input
                         type="number"
                         min="1"
@@ -406,9 +446,9 @@ const AddRoomPage = () => {
                     isRequired
                     className={fieldGroupClassName}
                   >
-                    <Label className={labelClassName}>Hourly Rate ($)</Label>
+                    <Label className={labelClassName}>Hourly rate (USD)</Label>
                     <div className="relative">
-                      <RiMoneyDollarCircleLine className="pointer-events-none absolute left-4 top-1/2 z-10 -translate-y-1/2 text-lg text-gray-500" />
+                      <RiMoneyDollarCircleLine className="pointer-events-none absolute left-3.5 top-1/2 z-10 size-[18px] -translate-y-1/2 text-stone-400" />
                       <Input
                         type="number"
                         min="0"
@@ -421,27 +461,31 @@ const AddRoomPage = () => {
                 </div>
               </div>
 
-              <div
-                className={`${sectionClassName} border-t border-stone-200 pt-8`}
-              >
-                <div>
-                  <h3 className={sectionTitleClassName}>Amenities</h3>
-                  <p className={`mt-1 ${sectionHintClassName}`}>
-                    Select everything included with this space.
-                  </p>
-                </div>
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className={sectionPanelClassName}>
+                <FormSectionHeader
+                  icon={RiCheckboxCircleLine}
+                  step={3}
+                  title="Amenities"
+                  description="Select everything included with this space."
+                />
+                <div className="grid grid-cols-1 gap-2.5 pt-2 sm:grid-cols-2">
                   {amenityOptions.map((option) => (
                     <label
                       key={option}
-                      className="flex cursor-pointer select-none items-center gap-4 rounded-lg border border-stone-200 bg-stone-50 px-4 py-4 text-sm font-medium text-gray-900 transition-colors hover:border-indigo-500 hover:bg-indigo-50 has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-50"
+                      className="flex cursor-pointer select-none items-center gap-3 rounded-xl border border-stone-200/90 bg-white px-4 py-3.5 text-sm font-medium text-stone-800 shadow-sm transition-all hover:border-indigo-200 hover:shadow-md hover:shadow-indigo-100/30 has-checked:border-indigo-400 has-checked:bg-indigo-50/80 has-checked:ring-1 has-checked:ring-indigo-200/80"
                     >
                       <input
                         type="checkbox"
                         name="amenities"
                         value={option}
-                        className="h-4 w-4 shrink-0 rounded border-stone-200 text-indigo-500 accent-indigo-500"
+                        className="peer sr-only"
                       />
+                      <span className="flex size-5 shrink-0 items-center justify-center rounded-md border border-stone-300 bg-white transition-colors peer-checked:border-indigo-500 peer-checked:[&_svg]:opacity-100">
+                        <RiCheckLine
+                          className="size-3.5 text-indigo-600 opacity-0 transition-opacity"
+                          aria-hidden
+                        />
+                      </span>
                       <span>{option}</span>
                     </label>
                   ))}
@@ -449,15 +493,20 @@ const AddRoomPage = () => {
               </div>
             </div>
 
-            <div className="flex flex-col gap-4 border-t border-stone-200 bg-stone-50 px-6 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-              <p className="text-sm text-gray-500">
-                Visible on browse after publish
-              </p>
+            <div className="flex flex-col gap-4 border-t border-stone-200/90 bg-stone-50/60 px-6 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+              <div className="space-y-0.5">
+                <p className="text-sm font-medium text-stone-800">
+                  Ready to publish?
+                </p>
+                <p className="text-xs text-stone-500">
+                  Your listing appears on browse immediately after submit.
+                </p>
+              </div>
               <Button
                 type="submit"
-                className="h-12 w-full rounded-full bg-indigo-500 px-8 text-sm font-semibold text-white transition-colors hover:bg-indigo-600 sm:w-auto"
+                className="h-11 w-full rounded-full bg-stone-900 px-8 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 hover:shadow-md sm:w-auto"
               >
-                List Focus Space
+                List focus space
               </Button>
             </div>
           </form>

@@ -18,8 +18,8 @@ const inter = Inter({
 
 export const metadata = {
   title: {
-    default: "Silentium – Where Deep Focus Begins",
-    template: "%s – Silentium",
+    default: "QuietHub - Where Deep Focus Begins",
+    template: "%s - QuietHub",
   },
   description:
     "Calm · Minimal · Intentional spaces, sessions, and reservations.",
@@ -33,7 +33,7 @@ export default function RootLayout({ children }) {
       className={`${inter.variable} ${poppins.variable}`}
       suppressHydrationWarning
     >
-      <body className="light bg-linear-to-br from-indigo-100/50 via-white to-violet-50 text-gray-900 antialiased selection:bg-indigo-200">
+      <body className="light bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.18),rgba(255,255,255,0.96)_35%),linear-gradient(145deg,#f8faff_0%,#ffffff_45%,#f6f3ff_100%)] text-gray-900 antialiased selection:bg-indigo-200">
         <NavBar />
         {children}
         <Footer />

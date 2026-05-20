@@ -11,6 +11,7 @@ import {
 } from "react-icons/ri";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import AnimatedCounter from "../Components/AnimatedCounter";
 import RescheduleBookingButton from "../Components/RescheduleBookingButton";
 import CancelBookingButton from "../Components/CancelBookingButton";
 import {
@@ -130,10 +131,10 @@ const MyBookingsPage = async () => {
             <div className="min-w-0 space-y-4">
               <p className="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-indigo-700 ring-1 ring-indigo-100">
                 <RiSparklingLine className="size-3.5" />
-                Your reservations
+                Your Bookings
               </p>
               <h1 className="text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">
-                My Reservations
+                My Bookings
               </h1>
               <p className="text-base leading-relaxed text-stone-600 sm:text-lg">
                 Upcoming sessions you can manage — past visits stay in your
@@ -144,7 +145,10 @@ const MyBookingsPage = async () => {
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 <div className="rounded-xl border border-white/80 bg-white/80 px-5 py-4 shadow-sm ring-1 ring-indigo-100/80 backdrop-blur-sm">
                   <p className="text-2xl font-bold text-stone-900">
-                    {bookingStats.active}
+                    <AnimatedCounter
+                      target={bookingStats.active}
+                      duration={1600}
+                    />
                   </p>
                   <p className="mt-1 flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-stone-500">
                     <span
@@ -156,7 +160,10 @@ const MyBookingsPage = async () => {
                 </div>
                 <div className="rounded-xl border border-white/80 bg-white/80 px-5 py-4 shadow-sm ring-1 ring-stone-200/80 backdrop-blur-sm">
                   <p className="text-2xl font-bold text-stone-600">
-                    {bookingStats.completed}
+                    <AnimatedCounter
+                      target={bookingStats.completed}
+                      duration={1800}
+                    />
                   </p>
                   <p className="mt-1 flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-stone-500">
                     <span
@@ -168,7 +175,10 @@ const MyBookingsPage = async () => {
                 </div>
                 <div className="rounded-xl border border-white/80 bg-white/80 px-5 py-4 shadow-sm ring-1 ring-rose-100/80 backdrop-blur-sm">
                   <p className="text-2xl font-bold text-rose-600">
-                    {bookingStats.cancelled}
+                    <AnimatedCounter
+                      target={bookingStats.cancelled}
+                      duration={1800}
+                    />
                   </p>
                   <p className="mt-1 flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-stone-500">
                     <span
@@ -180,7 +190,12 @@ const MyBookingsPage = async () => {
                 </div>
                 <div className="rounded-xl border border-white/80 bg-white/80 px-5 py-4 shadow-sm ring-1 ring-indigo-100/80 backdrop-blur-sm">
                   <p className="text-2xl font-bold text-indigo-600">
-                    ${bookingStats.totalCost.toFixed(2)}
+                    <AnimatedCounter
+                      target={bookingStats.totalCost}
+                      prefix="$"
+                      decimals={2}
+                      duration={2200}
+                    />
                   </p>
                   <p className="mt-1 text-xs font-medium uppercase tracking-wide text-stone-500">
                     Total spent

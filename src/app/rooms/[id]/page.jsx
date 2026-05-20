@@ -16,10 +16,9 @@ import { notFound } from "next/navigation";
 
 export async function generateMetadata({ params }) {
   const { id } = await params;
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_SERVER_URL}/rooms/${id}`,
-    { cache: "no-store" },
-  );
+  const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/rooms/${id}`, {
+    cache: "no-store",
+  });
 
   if (!res.ok) {
     return { title: "Room Not Found" };
@@ -150,7 +149,7 @@ const RoomDetails = async ({ params }) => {
                     Manage this space
                   </h2>
                   <p className="mt-2 text-sm leading-relaxed text-stone-500">
-                    Update details or remove the listing from Silentium.
+                    Update details or remove the listing from QuietHub.
                   </p>
                 </div>
                 <div className="flex flex-col gap-3 p-6">

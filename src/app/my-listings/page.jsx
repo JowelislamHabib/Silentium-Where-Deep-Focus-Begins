@@ -10,6 +10,7 @@ import {
 } from "react-icons/ri";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import AnimatedCounter from "../Components/AnimatedCounter";
 import DeleteRoomButton from "../Components/DeleteRoomButton";
 import EditRoom from "../Components/EditRoom";
 
@@ -81,7 +82,10 @@ const MyListingsPage = async () => {
               <div className="grid grid-cols-2 gap-3">
                 <div className="rounded-xl border border-white/80 bg-white/80 px-6 py-4 shadow-sm ring-1 ring-indigo-100/80 backdrop-blur-sm">
                   <p className="text-2xl font-bold text-stone-900">
-                    {roomList.length}
+                    <AnimatedCounter
+                      target={roomList.length}
+                      duration={1800}
+                    />
                   </p>
                   <p className="mt-1 flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-stone-500">
                     <span
@@ -93,7 +97,10 @@ const MyListingsPage = async () => {
                 </div>
                 <div className="rounded-xl border border-white/80 bg-white/80 px-6 py-4 shadow-sm ring-1 ring-indigo-100/80 backdrop-blur-sm">
                   <p className="text-2xl font-bold text-indigo-600">
-                    {totalBookings}
+                    <AnimatedCounter
+                      target={totalBookings}
+                      duration={2000}
+                    />
                   </p>
                   <p className="mt-1 text-xs font-medium uppercase tracking-wide text-stone-500">
                     Total bookings

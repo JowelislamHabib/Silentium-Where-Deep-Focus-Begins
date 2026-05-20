@@ -1,6 +1,7 @@
 "use client";
 
 import { RiFocus3Line, RiSparklingLine } from "react-icons/ri";
+import AnimatedCounter from "../Components/AnimatedCounter";
 import RoomCard from "../Components/RoomCard";
 import RoomsFilter from "../Components/RoomsFilter";
 import { useState, useEffect } from "react";
@@ -107,8 +108,8 @@ const RoomsPage = () => {
     filters.maxRate;
 
   return (
-    <section className="min-h-screen bg-linear-to-tl from-indigo-100/50 via-white to-violet-50">
-      <div className="relative overflow-hidden border-b border-indigo-100/60 bg-linear-to-br from-indigo-100/50 via-white to-violet-50">
+    <section className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.12),rgba(255,255,255,0.95)_36%),linear-gradient(145deg,#f8faff_0%,#ffffff_48%,#f6f3ff_100%)]">
+      <div className="relative overflow-hidden border-b border-indigo-100/60 bg-[radial-gradient(circle_at_10%_0%,rgba(129,140,248,0.2),transparent_35%),linear-gradient(to_bottom_right,#f7f8ff,#ffffff,#f8f5ff)]">
         <div
           aria-hidden
           className="pointer-events-none absolute -right-16 top-0 size-72 rounded-full bg-indigo-300/25 blur-3xl"
@@ -122,38 +123,47 @@ const RoomsPage = () => {
             <div className="max-w-2xl space-y-4">
               <p className="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-indigo-700 ring-1 ring-indigo-100">
                 <RiSparklingLine className="size-3.5" />
-                Focus spaces
+                Find your next room
               </p>
-              <h1 className="text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl lg:text-5xl">
-                Find your next deep-work session
+              <h1 className="text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">
+                Rooms engineered for deep work
               </h1>
               <p className="text-base leading-relaxed text-stone-600 sm:text-lg">
-                Quiet pods, solo alcoves, and group suites — book by the hour
-                and stay in the zone.
+                Explore premium private rooms, compare amenities instantly, and
+                book right away.
               </p>
             </div>
 
             <div className="flex flex-wrap gap-3 lg:shrink-0">
               <div className="rounded-xl border border-white/80 bg-white/80 px-6 py-4 shadow-sm ring-1 ring-indigo-100/80 backdrop-blur-sm">
                 <p className="text-2xl font-bold text-stone-900">
-                  {rooms.length}
+                  <AnimatedCounter target={rooms.length} duration={1800} />
                 </p>
                 <p className="text-xs font-medium uppercase tracking-wide text-stone-500">
-                  Spaces live
+                  Live rooms
                 </p>
               </div>
               {rooms.length > 0 && (
                 <div className="rounded-xl border border-white/80 bg-white/80 px-6 py-4 shadow-sm ring-1 ring-indigo-100/80 backdrop-blur-sm">
                   <p className="text-2xl font-bold text-indigo-600">
-                    ${minRateGlobal}
+                    <AnimatedCounter
+                      target={minRateGlobal}
+                      prefix="$"
+                      duration={1600}
+                    />
                     {maxRateGlobal > minRateGlobal && (
                       <span className="text-lg text-stone-400">
-                        –${maxRateGlobal}
+                        –
+                        <AnimatedCounter
+                          target={maxRateGlobal}
+                          prefix="$"
+                          duration={1800}
+                        />
                       </span>
                     )}
                   </p>
                   <p className="text-xs font-medium uppercase tracking-wide text-stone-500">
-                    Per hour
+                    Hourly range
                   </p>
                 </div>
               )}
@@ -179,9 +189,9 @@ const RoomsPage = () => {
 
           <div>
             {loading ? (
-              <div className="flex flex-col items-center justify-center rounded-2xl border border-stone-200 bg-white px-6 py-20 text-center">
+              <div className="flex flex-col items-center justify-center rounded-3xl border border-stone-200 bg-white/90 px-6 py-20 text-center shadow-sm ring-1 ring-stone-900/5">
                 <div className="mb-4 size-8 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"></div>
-                <p className="text-sm text-stone-500">Loading rooms...</p>
+                <p className="text-sm text-stone-500">Loading study rooms...</p>
               </div>
             ) : rooms.length > 0 ? (
               <>
@@ -191,7 +201,7 @@ const RoomsPage = () => {
                     <span className="font-semibold text-stone-900">
                       {rooms.length}
                     </span>{" "}
-                    {rooms.length === 1 ? "space" : "spaces"}
+                    {rooms.length === 1 ? "room" : "rooms"}
                     {hasActiveFilters && (
                       <span className="ml-2 text-xs text-indigo-600">
                         (filtered)
@@ -200,11 +210,11 @@ const RoomsPage = () => {
                   </p>
                   <span className="hidden items-center gap-1.5 text-xs font-medium text-stone-400 sm:inline-flex">
                     <RiFocus3Line className="size-3.5" />
-                    Sorted by newest
+                    Best for focused sessions
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 xl:grid-cols-3">
+                <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
                   {rooms.map((room) => (
                     <RoomCard key={room._id} room={room} />
                   ))}
@@ -216,7 +226,7 @@ const RoomsPage = () => {
                   <RiFocus3Line className="size-7" />
                 </span>
                 <h2 className="text-lg font-semibold text-stone-900">
-                  No spaces found
+                  No rooms found
                 </h2>
                 <p className="mt-2 max-w-sm text-sm text-stone-500">
                   Try adjusting your filters to see more rooms.

@@ -26,7 +26,7 @@ const DeleteRoomButton = ({ id }) => {
       if (res.ok) {
         toast.success("Room deleted successfully");
         close();
-        router.push("/rooms");
+        router.push("/my-listings");
       } else {
         toast.danger(data.message || "Failed to delete");
       }
