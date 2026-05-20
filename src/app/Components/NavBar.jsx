@@ -4,12 +4,16 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { AnimatePresence, motion } from "motion/react";
 import { Avatar, Button, Dropdown } from "@heroui/react";
 import {
-  RiCloseLine,
+  RiAddCircleLine,
+  RiCalendarScheduleLine,
+  RiHomeLine,
   RiLogoutBoxLine,
-  RiMenuLine,
+  RiSearchLine,
   RiSparklingLine,
+  RiStackLine,
   RiUserAddLine,
   RiUserLine,
 } from "react-icons/ri";
@@ -20,7 +24,41 @@ const dropdownItemClass =
 const dropdownIconBoxClass =
   "flex size-9 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 ring-1 ring-indigo-100";
 
+const mobileNavIconBoxClass =
+  "flex size-11 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 ring-1 ring-indigo-100";
+
 import { authClient } from "@/lib/auth-client";
+
+function MobileMenuButton({ isOpen, onToggle }) {
+  return (
+    <button
+      type="button"
+      aria-label={isOpen ? "Close menu" : "Open menu"}
+      aria-expanded={isOpen}
+      onClick={onToggle}
+      className="relative flex size-11 items-center justify-center rounded-full border border-stone-200/90 bg-white shadow-sm ring-1 ring-stone-900/5 transition-colors hover:border-indigo-200 hover:bg-indigo-50/50 md:hidden"
+    >
+      <span className="sr-only">{isOpen ? "Close menu" : "Open menu"}</span>
+      <span className="relative block h-3.5 w-5">
+        <span
+          className={`absolute left-0 block h-0.5 w-5 rounded-full bg-stone-900 transition-all duration-300 ease-out ${
+            isOpen ? "top-1.5 rotate-45" : "top-0"
+          }`}
+        />
+        <span
+          className={`absolute left-0 top-1.5 block h-0.5 w-5 rounded-full bg-stone-900 transition-all duration-300 ease-out ${
+            isOpen ? "scale-x-0 opacity-0" : "scale-x-100 opacity-100"
+          }`}
+        />
+        <span
+          className={`absolute left-0 block h-0.5 w-5 rounded-full bg-stone-900 transition-all duration-300 ease-out ${
+            isOpen ? "top-1.5 -rotate-45" : "top-3"
+          }`}
+        />
+      </span>
+    </button>
+  );
+}
 
 const LOGO_WIDTH = 714;
 const LOGO_HEIGHT = 268;
@@ -48,10 +86,42 @@ const NavBar = () => {
         : "text-stone-600 hover:bg-white hover:text-stone-900"
     }`;
 
+  const closeMobileMenu = () => setIsOpen(false);
+
   const mobileNavLinkClass = (path) =>
-    `block font-heading font-semibold text-xl no-underline ${
-      pathname === path ? "text-indigo-500 font-bold" : "text-gray-900"
+    `flex w-full items-center gap-3 rounded-2xl border px-3 py-3 no-underline transition-all duration-200 ${
+      pathname === path
+        ? "border-indigo-200 bg-indigo-50/80 shadow-sm ring-1 ring-indigo-100"
+        : "border-stone-200/80 bg-white hover:border-indigo-200 hover:bg-indigo-50/40"
     }`;
+
+  const primaryMobileLinks = [
+    { href: "/", label: "Home", icon: RiHomeLine, sub: "Back to landing" },
+    { href: "/rooms", label: "Rooms", icon: RiSearchLine, sub: "Browse study spaces" },
+  ];
+
+  const authMobileLinks = user
+    ? [
+        {
+          href: "/add-room",
+          label: "Add Room",
+          icon: RiAddCircleLine,
+          sub: "List a new space",
+        },
+        {
+          href: "/my-listings",
+          label: "My Listings",
+          icon: RiStackLine,
+          sub: "Manage your rooms",
+        },
+        {
+          href: "/my-bookings",
+          label: "My Bookings",
+          icon: RiCalendarScheduleLine,
+          sub: "Upcoming reservations",
+        },
+      ]
+    : [];
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-white/80 bg-white/60 backdrop-blur-xl">
@@ -210,93 +280,154 @@ const NavBar = () => {
             )}
           </div>
 
-          <Button
-            onClick={() => setIsOpen(!isOpen)}
-            className="rounded-full border border-stone-200 bg-white p-2 text-stone-900 shadow-sm transition-colors duration-150 hover:bg-stone-100 md:hidden"
-          >
-            {isOpen ? (
-              <RiCloseLine className="text-xl" />
-            ) : (
-              <RiMenuLine className="text-xl" />
-            )}
-          </Button>
+          <MobileMenuButton
+            isOpen={isOpen}
+            onToggle={() => setIsOpen((open) => !open)}
+          />
         </div>
 
-        {isOpen && (
-          <div className="space-y-6 border-t border-stone-200 bg-white/95 py-8 backdrop-blur-sm md:hidden">
-            <div className="space-y-4">
-              <Link href="/" className={mobileNavLinkClass("/")}>
-                Home
-              </Link>
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              key="mobile-menu"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+              className="overflow-hidden border-t border-stone-200/90 md:hidden"
+            >
+              <div className="space-y-5 bg-linear-to-b from-indigo-50/40 via-white to-white px-1 py-6">
+                <p className="px-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-indigo-600">
+                  Menu
+                </p>
 
-              <Link href="/rooms" className={mobileNavLinkClass("/rooms")}>
-                Rooms
-              </Link>
+                <nav className="flex flex-col gap-2.5">
+                  {[...primaryMobileLinks, ...authMobileLinks].map(
+                    (item, index) => {
+                      const Icon = item.icon;
+                      return (
+                        <motion.div
+                          key={item.href}
+                          initial={{ opacity: 0, x: -12 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{
+                            delay: 0.05 + index * 0.04,
+                            duration: 0.25,
+                          }}
+                        >
+                          <Link
+                            href={item.href}
+                            onClick={closeMobileMenu}
+                            className={mobileNavLinkClass(item.href)}
+                          >
+                            <span className={mobileNavIconBoxClass}>
+                              <Icon className="size-5" />
+                            </span>
+                            <span className="min-w-0 text-left">
+                              <span className="block text-sm font-semibold text-stone-900">
+                                {item.label}
+                              </span>
+                              <span className="block text-xs text-stone-500">
+                                {item.sub}
+                              </span>
+                            </span>
+                          </Link>
+                        </motion.div>
+                      );
+                    },
+                  )}
+                </nav>
 
-              {user && (
-                <>
-                  <Link
-                    href="/add-room"
-                    className={mobileNavLinkClass("/add-room")}
+                {!user ? (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2, duration: 0.25 }}
+                    className="flex flex-col gap-3 border-t border-stone-200/90 pt-5"
                   >
-                    Add Room
-                  </Link>
-
-                  <Link
-                    href="/my-listings"
-                    className={mobileNavLinkClass("/my-listings")}
+                    <p className="px-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-stone-500">
+                      Account
+                    </p>
+                    <Link
+                      href="/login"
+                      onClick={closeMobileMenu}
+                      className="flex h-11 items-center justify-center rounded-full border border-stone-200 bg-white text-sm font-semibold text-stone-900 no-underline shadow-sm transition-colors hover:border-indigo-200 hover:bg-indigo-50/50"
+                    >
+                      Sign in
+                    </Link>
+                    <Link
+                      href="/register"
+                      onClick={closeMobileMenu}
+                      className="flex h-11 items-center justify-center gap-2 rounded-full bg-stone-900 text-sm font-semibold text-white no-underline shadow-sm transition-colors hover:bg-indigo-700"
+                    >
+                      <RiUserAddLine className="size-[18px]" />
+                      Create account
+                    </Link>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2, duration: 0.25 }}
+                    className="space-y-3 border-t border-stone-200/90 pt-5"
                   >
-                    My Listings
-                  </Link>
+                    <div className="flex items-center gap-3 rounded-2xl border border-indigo-100 bg-white/90 px-3 py-3 shadow-sm ring-1 ring-indigo-100/80">
+                      <Avatar className="size-11 shrink-0 rounded-full border-2 border-white ring-1 ring-indigo-100">
+                        <Avatar.Image
+                          referrerPolicy="no-referrer"
+                          alt={user?.name}
+                          src={user?.image}
+                        />
+                        <Avatar.Fallback className="bg-indigo-50 text-sm font-semibold text-indigo-700">
+                          {user?.name?.charAt(0) ?? "S"}
+                        </Avatar.Fallback>
+                      </Avatar>
+                      <div className="min-w-0">
+                        <p className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-indigo-600">
+                          <RiSparklingLine className="size-3" />
+                          Signed in
+                        </p>
+                        <p className="truncate text-sm font-semibold text-stone-900">
+                          {user?.name || "Silentium member"}
+                        </p>
+                      </div>
+                    </div>
 
-                  <Link
-                    href="/my-bookings"
-                    className={mobileNavLinkClass("/my-bookings")}
-                  >
-                    My Bookings
-                  </Link>
-                </>
-              )}
-            </div>
+                    <Link
+                      href="/my-profile"
+                      onClick={closeMobileMenu}
+                      className={mobileNavLinkClass("/my-profile")}
+                    >
+                      <span className={mobileNavIconBoxClass}>
+                        <RiUserLine className="size-5" />
+                      </span>
+                      <span className="min-w-0 text-left">
+                        <span className="block text-sm font-semibold text-stone-900">
+                          My profile
+                        </span>
+                        <span className="block text-xs text-stone-500">
+                          Account & preferences
+                        </span>
+                      </span>
+                    </Link>
 
-            {!user ? (
-              <div className="pt-6 border-t border-stone-200 space-y-6">
-                <div className="flex flex-col gap-4">
-                  <Link
-                    href="/login"
-                    className="block rounded-full border border-stone-200 bg-stone-100 py-2.5 text-center font-sans text-sm font-medium text-gray-900 no-underline"
-                  >
-                    Sign In
-                  </Link>
-
-                  <Link
-                    href="/register"
-                    className="flex items-center justify-center gap-2 rounded-full bg-stone-900 py-2.5 text-center font-sans text-sm font-medium text-white no-underline"
-                  >
-                    <RiUserAddLine className="text-lg" />
-                    Register
-                  </Link>
-                </div>
+                    <Button
+                      type="button"
+                      onPress={() => {
+                        closeMobileMenu();
+                        handleLogout();
+                      }}
+                      className="flex h-11 w-full items-center justify-center gap-2 rounded-full border border-stone-200 bg-white text-sm font-semibold text-stone-900 shadow-sm transition-all hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700"
+                    >
+                      <RiLogoutBoxLine className="size-[18px]" />
+                      Sign out
+                    </Button>
+                  </motion.div>
+                )}
               </div>
-            ) : (
-              <div className="space-y-4 pt-4 border-t border-stone-200">
-                <Link
-                  href="/my-profile"
-                  className={mobileNavLinkClass("/my-profile")}
-                >
-                  Account
-                </Link>
-
-                <div
-                  onClick={handleLogout}
-                  className="block font-heading font-semibold text-xl text-gray-500 cursor-pointer"
-                >
-                  Sign Out
-                </div>
-              </div>
-            )}
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </nav>
   );
