@@ -13,6 +13,8 @@ const RoomsPage = () => {
 
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [liveRoomCount, setLiveRoomCount] = useState(0);
   const [filters, setFilters] = useState({
     search: searchParams.get("search") || "",
     amenities: [],
@@ -23,6 +25,47 @@ const RoomsPage = () => {
   const [amenityOptions, setAmenityOptions] = useState([]);
   const [minRateGlobal, setMinRateGlobal] = useState(0);
   const [maxRateGlobal, setMaxRateGlobal] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchGlobalStats = async () => {
+      setStatsLoading(true);
+      try {
+        const allRes = await fetch(
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/rooms`,
+        );
+        const allData = await allRes.json();
+        const allRooms = Array.isArray(allData) ? allData : [];
+        if (cancelled) return;
+
+        setLiveRoomCount(allRooms.length);
+
+        const allAmenities = [
+          ...new Set(allRooms.flatMap((room) => room.amenities ?? [])),
+        ];
+        setAmenityOptions(allAmenities.slice(0, 10));
+
+        const rates = allRooms.map((room) => Number(room.hourlyRate) || 0);
+        setMinRateGlobal(rates.length ? Math.min(...rates) : 0);
+        setMaxRateGlobal(rates.length ? Math.max(...rates) : 0);
+      } catch (error) {
+        console.error("Failed to fetch room stats:", error);
+        if (!cancelled) {
+          setLiveRoomCount(0);
+          setMinRateGlobal(0);
+          setMaxRateGlobal(0);
+        }
+      } finally {
+        if (!cancelled) setStatsLoading(false);
+      }
+    };
+
+    fetchGlobalStats();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     const fetchRooms = async () => {
@@ -41,23 +84,6 @@ const RoomsPage = () => {
         const data = await res.json();
         const roomList = Array.isArray(data) ? data : [];
         setRooms(roomList);
-
-        if (params.toString() === "") {
-          const allRes = await fetch(
-            `${process.env.NEXT_PUBLIC_SERVER_URL}/rooms`,
-          );
-          const allData = await allRes.json();
-          const allRooms = Array.isArray(allData) ? allData : [];
-
-          const allAmenities = [
-            ...new Set(allRooms.flatMap((room) => room.amenities ?? [])),
-          ];
-          setAmenityOptions(allAmenities.slice(0, 10));
-
-          const rates = allRooms.map((room) => Number(room.hourlyRate) || 0);
-          setMinRateGlobal(rates.length ? Math.min(...rates) : 0);
-          setMaxRateGlobal(rates.length ? Math.max(...rates) : 0);
-        }
 
         router.push(`?${params.toString()}`, { scroll: false });
       } catch (error) {
@@ -137,19 +163,28 @@ const RoomsPage = () => {
             <div className="flex flex-wrap gap-3 lg:shrink-0">
               <div className="rounded-xl border border-white/80 bg-white/80 px-6 py-4 shadow-sm ring-1 ring-indigo-100/80 backdrop-blur-sm">
                 <p className="text-2xl font-bold text-stone-900">
-                  <AnimatedCounter target={rooms.length} duration={1800} />
+                  {statsLoading ? (
+                    "—"
+                  ) : (
+                    <AnimatedCounter
+                      target={liveRoomCount}
+                      duration={1800}
+                      ready={!statsLoading}
+                    />
+                  )}
                 </p>
                 <p className="text-xs font-medium uppercase tracking-wide text-stone-500">
                   Live rooms
                 </p>
               </div>
-              {rooms.length > 0 && (
+              {!statsLoading && liveRoomCount > 0 && (
                 <div className="rounded-xl border border-white/80 bg-white/80 px-6 py-4 shadow-sm ring-1 ring-indigo-100/80 backdrop-blur-sm">
                   <p className="text-2xl font-bold text-indigo-600">
                     <AnimatedCounter
                       target={minRateGlobal}
                       prefix="$"
                       duration={1600}
+                      ready={!statsLoading}
                     />
                     {maxRateGlobal > minRateGlobal && (
                       <span className="text-lg text-stone-400">
@@ -158,6 +193,7 @@ const RoomsPage = () => {
                           target={maxRateGlobal}
                           prefix="$"
                           duration={1800}
+                          ready={!statsLoading}
                         />
                       </span>
                     )}
