@@ -10,7 +10,7 @@ import {
   Modal,
   toast,
 } from "@heroui/react";
-import { CalendarDate } from "@internationalized/date";
+import { CalendarDate, getLocalTimeZone, today } from "@internationalized/date";
 import { useRouter } from "next/navigation";
 import { RiArrowDownSLine, RiCalendarEventLine } from "react-icons/ri";
 import {
@@ -38,14 +38,20 @@ const toCalendarDate = (dateStr) => {
   return new CalendarDate(parts.year, parts.month, parts.day);
 };
 
+const clampToMinDate = (date, minDate) => {
+  if (!date || date.compare(minDate) < 0) return minDate;
+  return date;
+};
+
 const RescheduleBookingButton = ({ booking }) => {
   const router = useRouter();
   const roomName = booking.roomName ?? booking.room?.name ?? "this space";
   const hourlyRate =
     Number(booking.hourlyRate ?? booking.room?.hourlyRate) || 0;
+  const minSelectableDate = today(getLocalTimeZone());
 
   const [selectedDate, setSelectedDate] = useState(() =>
-    toCalendarDate(booking.date),
+    clampToMinDate(toCalendarDate(booking.date), minSelectableDate),
   );
   const [startTime, setStartTime] = useState(
     parseBookingHour(booking.startTime),
@@ -69,6 +75,11 @@ const RescheduleBookingButton = ({ booking }) => {
 
     if (Number(startTime) >= Number(endTime)) {
       toast.danger("End time must be after start time");
+      return;
+    }
+
+    if (selectedDate.compare(minSelectableDate) < 0) {
+      toast.danger("Date cannot be in the past");
       return;
     }
 
@@ -148,6 +159,7 @@ const RescheduleBookingButton = ({ booking }) => {
                   name="date"
                   value={selectedDate}
                   onChange={setSelectedDate}
+                  minValue={minSelectableDate}
                 >
                   <Label className={fieldLabelClass}>Date</Label>
 
@@ -172,7 +184,10 @@ const RescheduleBookingButton = ({ booking }) => {
                   </DateField.Group>
 
                   <DatePicker.Popover className="rounded-xl border border-stone-200 bg-white p-3 shadow-xl">
-                    <Calendar aria-label="Reschedule date">
+                    <Calendar
+                      aria-label="Reschedule date"
+                      minValue={minSelectableDate}
+                    >
                       <Calendar.Header className="mb-3 flex items-center justify-between">
                         <Calendar.YearPickerTrigger className="flex items-center gap-1 text-sm font-semibold text-stone-800">
                           <Calendar.YearPickerTriggerHeading />

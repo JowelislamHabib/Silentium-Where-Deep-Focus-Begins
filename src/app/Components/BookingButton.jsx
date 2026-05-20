@@ -11,7 +11,7 @@ import {
   toast,
   Avatar,
 } from "@heroui/react";
-import { CalendarDate } from "@internationalized/date";
+import { getLocalTimeZone, today } from "@internationalized/date";
 import {
   RiArrowDownSLine,
   RiCalendarCheckLine,
@@ -41,14 +41,9 @@ const BookingButton = ({ room }) => {
   const extraAmenitiesCount = amenities.length - visibleAmenities.length;
 
   const router = useRouter();
+  const minSelectableDate = today(getLocalTimeZone());
 
-  const [selectedDate, setSelectedDate] = useState(
-    new CalendarDate(
-      new Date().getFullYear(),
-      new Date().getMonth() + 1,
-      new Date().getDate(),
-    ),
-  );
+  const [selectedDate, setSelectedDate] = useState(minSelectableDate);
 
   const [startTime, setStartTime] = useState("09");
   const [endTime, setEndTime] = useState("10");
@@ -83,6 +78,11 @@ const BookingButton = ({ room }) => {
   const handleReservation = async () => {
     if (Number(startTime) >= Number(endTime)) {
       toast.danger("End time must be after start time");
+      return;
+    }
+
+    if (selectedDate.compare(minSelectableDate) < 0) {
+      toast.danger("Date cannot be in the past");
       return;
     }
 
@@ -327,6 +327,7 @@ const BookingButton = ({ room }) => {
                       name="date"
                       value={selectedDate}
                       onChange={setSelectedDate}
+                      minValue={minSelectableDate}
                     >
                       <Label className={fieldLabelClass}>Date</Label>
 
@@ -351,7 +352,10 @@ const BookingButton = ({ room }) => {
                       </DateField.Group>
 
                       <DatePicker.Popover className="rounded-xl border border-stone-200 bg-white p-3 shadow-xl">
-                        <Calendar aria-label="Reservation Date">
+                        <Calendar
+                          aria-label="Reservation Date"
+                          minValue={minSelectableDate}
+                        >
                           <Calendar.Header className="mb-3 flex items-center justify-between">
                             <Calendar.YearPickerTrigger className="flex items-center gap-1 text-sm font-semibold text-stone-800">
                               <Calendar.YearPickerTriggerHeading />
