@@ -292,7 +292,7 @@ Run `npm run build` then `npm start` behind a reverse proxy with HTTPS. Deploy t
 
 ## License
 
-This project is private (`"private": true` in `package.json`). Add a license file and terms before open-sourcing or redistribution.
+This project is private. Add a license file and terms before open-sourcing or redistribution.
 
 ---
 
