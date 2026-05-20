@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  RiFocus3Line,
-  RiSparklingLine,
-} from "react-icons/ri";
+import { RiFocus3Line, RiSparklingLine } from "react-icons/ri";
 import RoomCard from "../Components/RoomCard";
 import RoomsFilter from "../Components/RoomsFilter";
 import { useState, useEffect } from "react";
@@ -26,12 +23,10 @@ const RoomsPage = () => {
   const [minRateGlobal, setMinRateGlobal] = useState(0);
   const [maxRateGlobal, setMaxRateGlobal] = useState(0);
 
-  // Fetch rooms with filters
   useEffect(() => {
     const fetchRooms = async () => {
       setLoading(true);
       try {
-        // Build query string
         const params = new URLSearchParams();
         if (filters.search) params.append("search", filters.search);
         if (filters.amenities.length > 0)
@@ -46,7 +41,6 @@ const RoomsPage = () => {
         const roomList = Array.isArray(data) ? data : [];
         setRooms(roomList);
 
-        // Update global stats based on ALL rooms (not filtered)
         if (params.toString() === "") {
           const allRes = await fetch(
             `${process.env.NEXT_PUBLIC_SERVER_URL}/rooms`,
@@ -64,7 +58,6 @@ const RoomsPage = () => {
           setMaxRateGlobal(rates.length ? Math.max(...rates) : 0);
         }
 
-        // Update URL
         router.push(`?${params.toString()}`, { scroll: false });
       } catch (error) {
         console.error("Failed to fetch rooms:", error);
@@ -77,7 +70,6 @@ const RoomsPage = () => {
     fetchRooms();
   }, [filters.search, filters.amenities, filters.minRate, filters.maxRate]);
 
-  // Handle filter changes
   const handleSearchChange = (e) => {
     setFilters({ ...filters, search: e.target.value });
   };
