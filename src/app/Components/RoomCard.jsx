@@ -18,7 +18,7 @@ const RoomCard = ({ room }) => {
   const hourlyRate = Number(room?.hourlyRate) || 0;
 
   return (
-    <article className="group flex h-full min-h-112 flex-col overflow-hidden rounded-3xl border border-stone-200/90 bg-white/90 shadow-sm ring-1 ring-stone-900/5 transition-all duration-300 hover:-translate-y-1 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-100/40">
+    <article className="group flex h-full min-h-112 flex-col overflow-hidden rounded-2xl border border-stone-200/90 bg-white/90 shadow-sm ring-1 ring-stone-900/5 transition-all duration-300 hover:-translate-y-1 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-100/40">
       <Link
         href={`/rooms/${room?._id}`}
         className="relative block overflow-hidden"
@@ -43,7 +43,7 @@ const RoomCard = ({ room }) => {
 
       <div className="flex flex-1 flex-col p-5 sm:p-6">
         <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-indigo-600">
-          Quiet focus room
+          {room?.variant || "Quiet focus room"}
         </p>
         <Link href={`/rooms/${room?._id}`} className="space-y-2">
           <h2 className="line-clamp-1 text-xl font-semibold text-stone-900 transition-colors group-hover:text-indigo-700">
