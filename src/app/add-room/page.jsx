@@ -81,6 +81,15 @@ function isValidImageSrc(src) {
   }
 }
 
+const determineVariant = (capacity) => {
+  const cap = Number(capacity);
+  if (cap === 1) return "Solo Focus Pod";
+  if (cap >= 2 && cap <= 3) return "Duo Focus Suite";
+  if (cap >= 4 && cap <= 6) return "Huddle Room";
+  if (cap >= 7 && cap <= 8) return "Collaboration Hub";
+  return "Conference Room";
+};
+
 const AddRoomPage = () => {
   const router = useRouter();
   const [previewUrl, setPreviewUrl] = useState("");
@@ -106,9 +115,11 @@ const AddRoomPage = () => {
     const { name, description, image, floor, capacity, hourlyRate } =
       Object.fromEntries(formData.entries());
 
+    const variant = determineVariant(capacity);
     const roomDetails = {
       name,
       description,
+      variant,
       image,
       floor,
       capacity: Number(capacity),
