@@ -94,7 +94,53 @@ npm start
 |------------|-----------|
 | Browse rooms with filters (amenities, price, capacity) | Multi‑step form to add a new space |
 | View image galleries, floor, exact location | Edit or delete your listings |
-| Book a time slot with date & hour picker | See how many booked ( coming soon - who booked your room via bookings) |
-| Real‑time cost estimate | Manage your availability (coming soon) |
-| Reschedule or cancel upcoming bookings | |
+| Book with date + start time + duration selector | See how many booked ( coming soon - who booked your room via bookings) |
+| Live booking preview (start-end range) + real-time cost estimate | Manage your availability (coming soon) |
+| Reschedule or cancel upcoming bookings with same booking controls | |
+
+## Booking UX notes
+
+- Booking and rescheduling use same controls: **Date**, **Start time**, **Duration**.
+- A live **Booking preview** shows final range, for example: `11:00 PM - 2:00 AM (3 hours)`.
+- Pricing is calculated as `hourlyRate * durationHours`.
+- Frontend still sends `startTime` and `endTime` to backend (`HH:00` format), so existing backend conflict/overlap rules remain unchanged.
+
+## Payment gateway and payment info
+
+- Current gateway: **PipraPay**.
+- Charge init endpoint (frontend -> backend): `POST /payments/piprapay/create-charge`.
+- Verify endpoint after redirect return: `POST /payments/piprapay/verify`.
+- Frontend redirect success page: `/payment/success` (reads `pp_id`, `invoice_id`, `transaction_ref`, or `ppid` from query params).
+
+### Payment payload sent from frontend
+
+Frontend sends these key fields when creating charge:
+
+- `full_name`, `email_address`, `email_mobile`, `mobile_number`
+- `amount` (string, 2 decimals), `currency`
+- `return_type` (`GET`)
+- `metadata`:
+  - `type: "room_booking"`
+  - `roomId`, `roomName`, `userId`
+  - nested `booking` object (`date`, `startTime`, `endTime`, `totalCost`, etc.)
+
+### Payment flow
+
+1. User submits booking.
+2. Frontend calls `create-charge`.
+3. Backend returns `pp_id` and `pp_url`.
+4. Frontend stores pending booking in localStorage key: `pending-booking:${pp_id}`.
+5. User redirected to `pp_url` (PipraPay checkout).
+6. On return, `/payment/success` calls `verify` with `{ pp_id }`.
+7. If status is `completed`, booking shows as confirmed/completed based on date.
+
+### Required backend/env notes
+
+- `NEXT_PUBLIC_SERVER_URL` must point to backend exposing PipraPay payment routes.
+- Backend must securely hold gateway credentials/secrets (do **not** expose in frontend env).
+- If you add another gateway later (SSLCommerz/Stripe/etc), keep same abstraction shape:
+  - `create-charge`
+  - redirect url
+  - `verify`
+  - normalized payment status (`pending`, `completed`, `failed`)
 
